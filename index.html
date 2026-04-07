@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tome of Quotes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Shadows+Into+Light&family=Patrick+Hand&family=Caveat:wght@400;700&family=Indie+Flower&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* ── Side Menu ─────────────────────────────────────────── */
+        .menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1209 0%, #2a1a0a 50%, #1a1209 100%);
+            border-right: 2px solid #5a3a1a;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding: 18px 16px;
+            gap: 18px;
+            transition: transform 0.35s ease;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+        }
+        .menu.collapsed {
+            transform: translateX(-260px);
+        }
+        .menu-toggle {
+            position: absolute;
+            top: 10px;
+            right: -36px;
+            width: 32px;
+            height: 32px;
+            background: #2a1a0a;
+            border: 1px solid #5a3a1a;
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            color: #c4a265;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .menu-toggle:hover {
+            background: #3a2a1a;
+        }
+        .menu.collapsed .menu-toggle {
+            right: -36px;
+        }
+        .menu h2 {
+            color: #c4a265;
+            font-family: 'Palatino Linotype', serif;
+            font-size: 16px;
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .menu-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .menu-section label {
+            color: #a08050;
+            font-family: 'Palatino Linotype', serif;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .menu input[type="text"] {
+            background: #0e0a05;
+            border: 1px solid #5a3a1a;
+            color: #d4b87a;
+            padding: 7px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Palatino Linotype', serif;
+            outline: none;
+            width: 100%;
+        }
+        .menu input[type="text"]:focus {
+            border-color: #c4a265;
+        }
+        .menu input[type="text"]::placeholder {
+            color: #6a5030;
+        }
+        .menu input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #0e0a05;
+            border-radius: 3px;
+            outline: none;
+            border: 1px solid #5a3a1a;
+        }
+        .menu input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #c4a265;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .menu input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #c4a265;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+        .menu select {
+            background: #0e0a05;
+            border: 1px solid #5a3a1a;
+            color: #d4b87a;
+            padding: 7px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+            cursor: pointer;
+        }
+        .menu select:focus {
+            border-color: #c4a265;
+        }
+        .menu-btn {
+            background: linear-gradient(180deg, #3a2a1a 0%, #2a1a0a 100%);
+            border: 1px solid #5a3a1a;
+            color: #c4a265;
+            padding: 9px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Palatino Linotype', serif;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s, border-color 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .menu-btn:hover {
+            background: linear-gradient(180deg, #4a3a2a 0%, #3a2a1a 100%);
+            border-color: #c4a265;
+        }
+        .size-display {
+            color: #c4a265;
+            font-family: 'Palatino Linotype', serif;
+            font-size: 12px;
+            text-align: center;
+            min-width: 36px;
+        }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-row {
+            display: flex;
+            gap: 6px;
+        }
+        .search-row input {
+            flex: 1;
+        }
+        .search-row .menu-btn {
+            padding: 7px 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .search-info {
+            color: #a08050;
+            font-family: 'Palatino Linotype', serif;
+            font-size: 11px;
+            min-height: 16px;
+        }
+        .menu-divider {
+            border: none;
+            border-top: 1px solid #3a2a1a;
+            margin: 2px 0;
+        }
+
+        /* ── Line prefix highlighting ───────────────────── */
+        .line-prefix {
+            border-radius: 3px;
+            padding: 0 3px;
+            transition: background-color 0.15s, color 0.15s;
+            cursor: default;
+        }
+        .line-prefix:hover {
+            background-color: var(--prefix-bg);
+            color: var(--prefix-color);
+        }
+
+        .scene {
+            perspective: 2000px;
+        }
+
+        .book {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: filter 0.2s;
+        }
+
+        .book:hover {
+            filter: brightness(1.06);
+        }
+
+        .book.busy {
+            pointer-events: none;
+        }
+
+        .book .base {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+        }
+
+        /* ── Text overlay on open book ─────────────────────────── */
+        .page-text {
+            position: absolute;
+            overflow: hidden;
+            color: #2a1a0a;
+            font-size: 0.82em;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            pointer-events: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            cursor: text;
+            z-index: 4;
+        }
+        .page-text.left {
+            top: 14.6%;
+            left: 15.6%;
+            width: 31.7%;
+            height: 50.8%;
+            padding: 0.5% 1%;
+        }
+        .page-text.right {
+            top: 15.6%;
+            left: 54.2%;
+            width: 32.7%;
+            height: 50.8%;
+            padding: 0.5% 1%;
+        }
+
+        /* ── Flip animation layers ─────────────────────────────── */
+        .flip-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .flip-layer img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform-origin: 50% 50%;
+        }
+        .flip-layer .page-text {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform-origin: 50% 50%;
+        }
+
+        .spine-shadow {
+            position: absolute;
+            top: 0;
+            left: 42%;
+            width: 16%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .sweep-shadow {
+            position: absolute;
+            top: 5%;
+            height: 90%;
+            pointer-events: none;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Side Menu ──────────────────────────────────────── -->
+    <div class="menu" id="sideMenu">
+        <button class="menu-toggle" id="menuToggle" title="Toggle menu">◀</button>
+
+        <h2>⚙ Tome Tools</h2>
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <label>Search</label>
+            <div class="search-row">
+                <input type="text" id="searchInput" placeholder="Search text...">
+                <button class="menu-btn" id="searchBtn">Go</button>
+            </div>
+            <div class="search-info" id="searchInfo"></div>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <label>Character</label>
+            <select id="charFilter">
+                <option value="all" selected>All</option>
+                <option value="pes">Kruber</option>
+                <option value="pwh">Saltzpyre</option>
+                <option value="pbw">Sienna</option>
+                <option value="pwe">Kerillian</option>
+                <option value="pdr">Bardin</option>
+            </select>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <label>Prefix</label>
+            <select id="prefixSelect">
+                <option value="event">Event Name</option>
+                <option value="name" selected>Character Name</option>
+                <option value="initials">Character Initials</option>
+            </select>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <label>Font</label>
+            <select id="fontSelect">
+                <option value="'Caveat', cursive">Caveat</option>
+                <option value="'Dancing Script', cursive">Dancing Script</option>
+                <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
+                <option value="'Patrick Hand', cursive">Patrick Hand</option>
+                <option value="'Indie Flower', cursive">Indie Flower</option>
+                <option value="'Kalam', cursive">Kalam</option>
+                <option value="'Palatino Linotype', 'Book Antiqua', Palatino, serif">Palatino</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif" selected>Times New Roman</option>
+                <option value="'Courier New', monospace">Courier New</option>
+            </select>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <label>Text Size</label>
+            <div class="slider-row">
+                <input type="range" id="sizeSlider" min="8" max="28" value="12">
+                <span class="size-display" id="sizeDisplay">12px</span>
+            </div>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <button class="menu-btn" id="downloadBtn">⬇ Download Tome of Quotes</button>
+        </div>
+
+        <hr class="menu-divider">
+
+        <div class="menu-section">
+            <button class="menu-btn" id="downloadCurrentBtn">⬇ Download Current Text</button>
+        </div>
+    </div>
+
+    <div class="scene">
+        <div class="book" id="book">
+            <img class="base" id="baseImg" alt="Vermintide Tome">
+            <div class="page-text left" id="textLeft"></div>
+            <div class="page-text right" id="textRight"></div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var IMAGES = {
+            closed:    'tome_closed.png',
+            firstPage: 'tome_first_page.png',
+            open:      'tome_open.png',
+            lastPage:  'tome_last_page.png'
+        };
+
+        var TEXT_FILE = 'Tome of Quotes.txt';
+        var allLines = [];   // raw lines from file
+        var bookFontSize = 12;  // px
+        var bookFontFamily = "'Times New Roman', serif";
+        var searchMode = false;
+        var searchResults = [];
+        var prefixMode = 'name'; // 'event' | 'name' | 'initials'
+        var charFilterPrefix = 'all'; // 'all' | 'pbw' | 'pwh' | 'pes' | 'pwe' | 'pdr'
+
+        var CHAR_MAP = {
+            pbw: { name: 'Sienna',    initials: 'SF', color: '#c0392b' },
+            pwh: { name: 'Saltzpyre', initials: 'VS', color: '#1a1a1a', textColor: '#ffffff' },
+            pes: { name: 'Kruber',    initials: 'MK', color: '#2e6da4' },
+            pwe: { name: 'Kerillian', initials: 'K',  color: '#27ae60' },
+            pdr: { name: 'Bardin',    initials: 'BG', color: '#1a6e3a' }
+        };
+
+        // States: 'closed' | 'first_page' | 'content' | 'last_page'
+        var state = 'closed';
+        var contentSpread = 0;   // which two-page spread we're on (0-based)
+        var spreads = [];        // array of { left: string, right: string }
+        var busy = false;
+
+        var book     = document.getElementById('book');
+        var baseImg  = document.getElementById('baseImg');
+        var textL    = document.getElementById('textLeft');
+        var textR    = document.getElementById('textRight');
+
+        // ── Preload images ──────────────────────────────────────
+        var openW = 0, openH = 0;
+
+        function preloadImages() {
+            var srcs = Object.values(IMAGES);
+            return Promise.all(srcs.map(function (src) {
+                return new Promise(function (resolve) {
+                    var img = new Image();
+                    img.onload = function () {
+                        if (src !== IMAGES.closed) {
+                            openW = Math.max(openW, img.naturalWidth);
+                            openH = Math.max(openH, img.naturalHeight);
+                        }
+                        resolve();
+                    };
+                    img.onerror = resolve;
+                    img.src = src;
+                });
+            }));
+        }
+
+        // ── Load & paginate text ────────────────────────────────
+        function loadText() {
+            return fetch(TEXT_FILE)
+                .then(function (r) {
+                    if (!r.ok) throw new Error('Failed to load ' + TEXT_FILE);
+                    return r.text();
+                })
+                .then(function (raw) {
+                    allLines = raw.split(/\r?\n/);
+                    paginateText(getActiveLines());
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    allLines = ['', '', 'Error: Could not load text file.', err.message];
+                    paginateText(allLines);
+                });
+        }
+
+        function filterByChar(lines) {
+            if (charFilterPrefix === 'all') return lines;
+            return lines.filter(function (line) {
+                return line.substring(0, 3).toLowerCase() === charFilterPrefix;
+            });
+        }
+
+        function getActiveLines() {
+            if (searchMode) {
+                return searchResults.length > 0
+                    ? filterByChar(searchResults)
+                    : ['', '', 'No results found.'];
+            }
+            return filterByChar(allLines);
+        }
+
+        function paginateText(lines) {
+            // Measure how many lines fit in one page area.
+            var bw = book.offsetWidth;
+            var bh = book.offsetHeight;
+            var pageW = Math.round(bw * 0.317 - bw * 0.02);
+            var pageH = Math.round(bh * 0.508 - bh * 0.01);
+
+            // Measure one line height using a separate unsized element
+            var liner = document.createElement('div');
+            liner.style.cssText =
+                'position:absolute; visibility:hidden;' +
+                'white-space:pre-wrap; word-wrap:break-word;' +
+                'width:' + pageW + 'px;' +
+                'font-family:' + bookFontFamily + ';' +
+                'font-size:' + bookFontSize + 'px;' +
+                'line-height:1.45;';
+            liner.textContent = 'X';
+            document.body.appendChild(liner);
+            var lineH = liner.offsetHeight;
+            document.body.removeChild(liner);
+
+            var linesPerPage = Math.max(1, Math.floor(pageH / lineH));
+
+            // Build spreads: each has a left page + right page
+            spreads = [];
+            var i = 0;
+            while (i < lines.length) {
+                var leftLines  = lines.slice(i, i + linesPerPage);
+                i += linesPerPage;
+                var rightLines = lines.slice(i, i + linesPerPage);
+                i += linesPerPage;
+                spreads.push({
+                    left:  leftLines.join('\n'),
+                    right: rightLines.join('\n')
+                });
+            }
+        }
+
+        // ── Sizing ──────────────────────────────────────────────
+        function fitBook() {
+            if (!openW || !openH) return;
+            var vw = window.innerWidth * 0.98;
+            var vh = window.innerHeight * 0.96;
+            var s = Math.min(vw / openW, vh / openH);
+            book.style.width  = Math.round(openW * s) + 'px';
+            book.style.height = Math.round(openH * s) + 'px';
+        }
+
+        // ── Line formatting ─────────────────────────────────
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function formatLinePlain(line) {
+            var colonIdx = line.indexOf(': ');
+            if (colonIdx === -1) return line;
+
+            var eventName = line.substring(0, colonIdx);
+            var dialogue = line.substring(colonIdx);
+            var prefix3 = eventName.substring(0, 3).toLowerCase();
+            var charInfo = CHAR_MAP[prefix3];
+
+            if (prefixMode === 'name' && charInfo) {
+                return charInfo.name + dialogue;
+            } else if (prefixMode === 'initials' && charInfo) {
+                return charInfo.initials + dialogue;
+            }
+            return line;
+        }
+
+        function formatLine(line) {
+            // Split at first ": " to separate event name from dialogue
+            var colonIdx = line.indexOf(': ');
+            if (colonIdx === -1) return escapeHtml(line);
+
+            var eventName = line.substring(0, colonIdx);
+            var dialogue = line.substring(colonIdx); // includes ": "
+            var prefix3 = eventName.substring(0, 3).toLowerCase();
+            var charInfo = CHAR_MAP[prefix3];
+
+            var prefixText;
+            if (prefixMode === 'event') {
+                prefixText = escapeHtml(eventName);
+            } else if (prefixMode === 'name' && charInfo) {
+                prefixText = escapeHtml(charInfo.name);
+            } else if (prefixMode === 'initials' && charInfo) {
+                prefixText = escapeHtml(charInfo.initials);
+            } else {
+                prefixText = escapeHtml(eventName);
+            }
+
+            if (charInfo) {
+                var textCol = charInfo.textColor || '#ffffff';
+                return '<span class="line-prefix" data-char="' + prefix3 + '" '
+                    + 'style="--prefix-bg:' + charInfo.color + '; --prefix-color:' + textCol + ';"'
+                    + '>' + prefixText + '</span>' + escapeHtml(dialogue);
+            }
+            return prefixText + escapeHtml(dialogue);
+        }
+
+        function formatLines(text) {
+            var lines = text.split('\n');
+            var out = [];
+            for (var i = 0; i < lines.length; i++) {
+                out.push(formatLine(lines[i]));
+            }
+            return out.join('\n');
+        }
+
+        // ── Display helpers ─────────────────────────────────────
+        function showText(spreadIdx) {
+            var sp = spreads[spreadIdx];
+            if (!sp) { clearText(); return; }
+            textL.innerHTML = formatLines(sp.left);
+            textR.innerHTML = formatLines(sp.right);
+            textL.style.fontFamily = bookFontFamily;
+            textR.style.fontFamily = bookFontFamily;
+            textL.style.fontSize = bookFontSize + 'px';
+            textR.style.fontSize = bookFontSize + 'px';
+        }
+
+        function clearText() {
+            textL.innerHTML = '';
+            textR.innerHTML = '';
+        }
+
+        var firstPageHtml =
+            '<div style="text-align:center; margin-bottom:8px;"><b style="font-size:1.4em;">Tome of Quotes</b></div>'
+            + '<div style="margin-bottom:6px;">All rights to the text, characters, and universe of Warhammer: Vermintide belong to <b>Fatshark AB</b>. '
+            + 'This project is a <b>non-commercial fan project</b> and is not affiliated with or endorsed by Fatshark.</div>'
+            + '<div style="margin-bottom:6px;">The text contained within is the complete collection of hero voice line subtitles, '
+            + 'ripped directly from the Wwise sound engine. Each line is prefixed with its original sound event name.</div>'
+            + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
+            + '<div style="margin-bottom:4px;"><b>Menu Options:</b></div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Font</b> &ndash; Choose your preferred reading font.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Text Size</b> &ndash; Adjust text size with the slider.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
+            + '<div style="margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
+            + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
+            + '<div style="text-align:center; margin-top:8px; font-style:italic;"><b>Enjoy the Tome!</b><br>&iexcl;OISEAUQUE!</div>';
+
+        function showFirstPage() {
+            clearText();
+            textR.style.fontFamily = "'Times New Roman', serif";
+            textR.style.fontSize = '11px';
+            textR.innerHTML = firstPageHtml;
+        }
+
+        function setBaseImage(key) {
+            baseImg.src = IMAGES[key];
+            baseImg.style.objectPosition =
+                (key === 'closed') ? 'right center' : 'center center';
+        }
+
+        // ── Flip animation ──────────────────────────────────────
+        function doFlip(opts) {
+            // opts: { fromImg, toKey, direction, newText, onDone }
+            // newText: { spreadIdx } or null
+            busy = true;
+            book.classList.add('busy');
+            var duration = 700;
+            var closing = (opts.direction === 'back');
+
+            // — Flip layer: clipped to turning half (right side for forward) —
+            var layer = document.createElement('div');
+            layer.className = 'flip-layer';
+
+            var flipImg = document.createElement('img');
+            flipImg.src = opts.fromImg;
+            if (opts.fromImg === IMAGES.closed) {
+                flipImg.style.objectPosition = 'right center';
+            }
+            layer.appendChild(flipImg);
+
+            // Add old right text to the flip layer so it rotates away with the page
+            if (!closing && opts.oldRightText) {
+                var flipRightText = document.createElement('div');
+                flipRightText.className = 'page-text right';
+                flipRightText.style.pointerEvents = 'none';
+                flipRightText.style.fontFamily = bookFontFamily;
+                flipRightText.style.fontSize = bookFontSize + 'px';
+                flipRightText.innerHTML = formatLines(opts.oldRightText);
+                layer.appendChild(flipRightText);
+            }
+
+            var clip = closing
+                ? 'inset(0 50% 0 0)'
+                : 'inset(0 0 0 50%)';
+            layer.style.clipPath = clip;
+            layer.style.webkitClipPath = clip;
+            layer.style.backfaceVisibility = 'hidden';
+
+            // — Old left text layer: visible in first half, covered by back layer —
+            var oldLeftLayer = null;
+            if (!closing && opts.oldLeftText) {
+                oldLeftLayer = document.createElement('div');
+                oldLeftLayer.className = 'flip-layer';
+                // Clip to left half, exclude bottom 28% to keep bookmark stationary
+                oldLeftLayer.style.clipPath = 'inset(0 50% 28% 0)';
+                oldLeftLayer.style.webkitClipPath = 'inset(0 50% 28% 0)';
+                oldLeftLayer.style.zIndex = '1';
+
+                var oldLeftImg = document.createElement('img');
+                oldLeftImg.src = opts.fromImg;
+                oldLeftLayer.appendChild(oldLeftImg);
+
+                var oldLeftText = document.createElement('div');
+                oldLeftText.className = 'page-text left';
+                oldLeftText.style.pointerEvents = 'none';
+                oldLeftText.style.fontFamily = bookFontFamily;
+                oldLeftText.style.fontSize = bookFontSize + 'px';
+                oldLeftText.innerHTML = formatLines(opts.oldLeftText);
+                oldLeftLayer.appendChild(oldLeftText);
+            }
+
+            // — Back-of-page layer: shows new left text arriving with the flip —
+            var backLayer = null;
+            if (!closing && opts.newText) {
+                var sp = spreads[opts.newText.spreadIdx];
+                if (sp) {
+                    backLayer = document.createElement('div');
+                    backLayer.className = 'flip-layer';
+                    // Clip to left half, exclude bottom 28% to keep bookmark stationary
+                    backLayer.style.clipPath = 'inset(0 50% 28% 0)';
+                    backLayer.style.webkitClipPath = 'inset(0 50% 28% 0)';
+
+                    var backImg = document.createElement('img');
+                    backImg.src = IMAGES.open;
+                    backLayer.appendChild(backImg);
+
+                    var backText = document.createElement('div');
+                    backText.className = 'page-text left';
+                    backText.style.pointerEvents = 'none';
+                    backText.style.fontFamily = bookFontFamily;
+                    backText.style.fontSize = bookFontSize + 'px';
+                    backText.innerHTML = formatLines(sp.left);
+                    backLayer.appendChild(backText);
+
+                    // Start flipped (hidden via backface), rotate into view
+                    backLayer.style.transform = 'rotateY(180deg)';
+                    backLayer.style.backfaceVisibility = 'hidden';
+                }
+            } else if (!closing && opts.backImage) {
+                // Back of a non-content page (e.g. inside of book cover)
+                backLayer = document.createElement('div');
+                backLayer.className = 'flip-layer';
+                // Clip to left half, exclude bottom 28% to keep bookmark stationary
+                backLayer.style.clipPath = 'inset(0 50% 28% 0)';
+                backLayer.style.webkitClipPath = 'inset(0 50% 28% 0)';
+
+                var backCoverImg = document.createElement('img');
+                backCoverImg.src = opts.backImage;
+                backLayer.appendChild(backCoverImg);
+
+                backLayer.style.transform = 'rotateY(180deg)';
+                backLayer.style.backfaceVisibility = 'hidden';
+            }
+
+            // Shadows
+            var spine = document.createElement('div');
+            spine.className = 'spine-shadow';
+            spine.style.opacity = '0';
+
+            var sweep = document.createElement('div');
+            sweep.className = 'sweep-shadow';
+            sweep.style.background = closing
+                ? 'linear-gradient(to right, transparent, rgba(0,0,0,0.18))'
+                : 'linear-gradient(to left, transparent, rgba(0,0,0,0.18))';
+
+            book.appendChild(layer);
+            if (oldLeftLayer) book.appendChild(oldLeftLayer);
+            if (backLayer) book.appendChild(backLayer);
+            book.appendChild(spine);
+            book.appendChild(sweep);
+
+            // Set destination image immediately; delay right text slightly
+            // so the flip layer is fully rendered before text appears underneath.
+            setBaseImage(opts.toKey);
+            clearText();
+
+            setTimeout(function () {
+                if (opts.newText) {
+                    var sp2 = spreads[opts.newText.spreadIdx];
+                    if (sp2) {
+                        textR.innerHTML = formatLines(sp2.right);
+                        textR.style.fontFamily = bookFontFamily;
+                        textR.style.fontSize = bookFontSize + 'px';
+                    }
+                }
+                if (opts.showFirstPageText) {
+                    textR.style.fontFamily = "'Times New Roman', serif";
+                    textR.style.fontSize = '11px';
+                    textR.innerHTML = firstPageHtml;
+                }
+            }, 60);
+
+            // Animate flip layer (old right page rotating away)
+            var angle = closing ? 180 : -180;
+            layer.animate([
+                { transform: 'rotateY(0deg)' },
+                { transform: 'rotateY(' + angle + 'deg)' }
+            ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+                fill: 'forwards'
+            });
+
+            // Animate back layer (new left page rotating into view)
+            if (backLayer) {
+                backLayer.animate([
+                    { transform: 'rotateY(180deg)' },
+                    { transform: 'rotateY(0deg)' }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+                    fill: 'forwards'
+                });
+            }
+
+            // If no back layer, fade old left text out early so it vanishes before flip ends
+            if (oldLeftLayer && !backLayer) {
+                oldLeftLayer.animate([
+                    { opacity: 1 },
+                    { opacity: 0 }
+                ], {
+                    duration: duration * 0.4,
+                    easing: 'ease-out',
+                    fill: 'forwards'
+                });
+            }
+
+            spine.animate([
+                { opacity: 0 },
+                { opacity: 1, offset: 0.35 },
+                { opacity: 1, offset: 0.65 },
+                { opacity: 0 }
+            ], { duration: duration, easing: 'ease-in-out' });
+
+            if (closing) {
+                sweep.animate([
+                    { left: '5%',  width: '0%',  opacity: 0 },
+                    { left: '25%', width: '20%', opacity: 0.8, offset: 0.4 },
+                    { left: '55%', width: '15%', opacity: 0.5, offset: 0.75 },
+                    { left: '75%', width: '0%',  opacity: 0 }
+                ], { duration: duration, easing: 'ease-in-out' });
+            } else {
+                sweep.animate([
+                    { left: '75%', width: '0%',  opacity: 0 },
+                    { left: '40%', width: '20%', opacity: 0.8, offset: 0.4 },
+                    { left: '15%', width: '15%', opacity: 0.5, offset: 0.75 },
+                    { left: '5%',  width: '0%',  opacity: 0 }
+                ], { duration: duration, easing: 'ease-in-out' });
+            }
+
+            setTimeout(function () {
+                layer.remove();
+                if (oldLeftLayer) oldLeftLayer.remove();
+                if (backLayer) backLayer.remove();
+                spine.remove();
+                sweep.remove();
+                // Now show the left text as flat on the base layer
+                if (opts.newText) {
+                    showText(opts.newText.spreadIdx);
+                }
+                busy = false;
+                book.classList.remove('busy');
+                if (opts.onDone) opts.onDone();
+            }, duration + 30);
+        }
+
+        // ── Click handler / state machine ───────────────────────
+        function handleClick() {
+            if (busy) return;
+
+            switch (state) {
+                case 'closed':
+                    // Open cover → first page
+                    doFlip({
+                        fromImg: IMAGES.closed,
+                        toKey: 'firstPage',
+                        direction: 'forward',
+                        showFirstPageText: true,
+                        onDone: function () { state = 'first_page'; showFirstPage(); }
+                    });
+                    break;
+
+                case 'first_page':
+                    // First page → first content spread
+                    contentSpread = 0;
+                    doFlip({
+                        fromImg: IMAGES.firstPage,
+                        toKey: 'open',
+                        direction: 'forward',
+                        newText: { spreadIdx: 0 },
+                        onDone: function () { state = 'content'; }
+                    });
+                    break;
+
+                case 'content':
+                    if (contentSpread < spreads.length - 1) {
+                        var nextSpread = contentSpread + 1;
+                        var oldSp = spreads[contentSpread];
+                        doFlip({
+                            fromImg: IMAGES.open,
+                            toKey: 'open',
+                            direction: 'forward',
+                            oldLeftText: oldSp ? oldSp.left : '',
+                            newText: { spreadIdx: nextSpread },
+                            onDone: function () { contentSpread = nextSpread; }
+                        });
+                    } else {
+                        var oldSp2 = spreads[contentSpread];
+                        doFlip({
+                            fromImg: IMAGES.open,
+                            toKey: 'lastPage',
+                            direction: 'forward',
+                            oldLeftText: oldSp2 ? oldSp2.left : '',
+                            oldRightText: oldSp2 ? oldSp2.right : '',
+                            onDone: function () { state = 'last_page'; clearText(); }
+                        });
+                    }
+                    break;
+
+                case 'last_page':
+                    doFlip({
+                        fromImg: IMAGES.lastPage,
+                        toKey: 'closed',
+                        direction: 'back',
+                        onDone: function () {
+                            state = 'closed';
+                            contentSpread = 0;
+                        }
+                    });
+                    break;
+            }
+        }
+
+        function handleClickBack() {
+            if (busy) return;
+
+            switch (state) {
+                case 'closed':
+                    // Can't go back from closed
+                    break;
+
+                case 'first_page':
+                    // Back to closed
+                    doFlip({
+                        fromImg: IMAGES.firstPage,
+                        toKey: 'closed',
+                        direction: 'back',
+                        onDone: function () { state = 'closed'; clearText(); }
+                    });
+                    break;
+
+                case 'content':
+                    if (contentSpread > 0) {
+                        var prevSpread = contentSpread - 1;
+                        doFlip({
+                            fromImg: IMAGES.open,
+                            toKey: 'open',
+                            direction: 'back',
+                            newText: { spreadIdx: prevSpread },
+                            onDone: function () { contentSpread = prevSpread; }
+                        });
+                    } else {
+                        // Back to first page
+                        doFlip({
+                            fromImg: IMAGES.open,
+                            toKey: 'firstPage',
+                            direction: 'back',
+                            onDone: function () { state = 'first_page'; showFirstPage(); }
+                        });
+                    }
+                    break;
+
+                case 'last_page':
+                    // Back to last content spread
+                    var lastSpreadIdx = Math.max(0, spreads.length - 1);
+                    doFlip({
+                        fromImg: IMAGES.lastPage,
+                        toKey: 'open',
+                        direction: 'back',
+                        newText: { spreadIdx: lastSpreadIdx },
+                        onDone: function () { state = 'content'; contentSpread = lastSpreadIdx; }
+                    });
+                    break;
+            }
+        }
+
+        // ── Init ────────────────────────────────────────────────
+        Promise.all([preloadImages(), loadText()]).then(function () {
+            setBaseImage('closed');
+            clearText();
+            fitBook();
+            // Re-paginate after first layout so measurements are accurate
+            paginateText(getActiveLines());
+            window.addEventListener('resize', function () {
+                fitBook();
+                var oldSpreadIdx = contentSpread;
+                paginateText(getActiveLines());
+                if (state === 'content') showText(oldSpreadIdx);
+            });
+            // ── Pointer / touch interaction ─────────────────────
+            var pointerDown = null; // { x, y }
+
+            function onPointerDown(x, y) {
+                pointerDown = { x: x, y: y };
+            }
+
+            function onPointerUp(x, y) {
+                if (!pointerDown) return;
+                var dx = x - pointerDown.x;
+                var dy = y - pointerDown.y;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                pointerDown = null;
+
+                // Check for text selection
+                var sel = window.getSelection();
+                if (sel && sel.toString().length > 0) return;
+
+                // Swipe detection (horizontal > 40px and more horizontal than vertical)
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                    if (dx < 0) {
+                        // Swipe left → forward
+                        handleClick();
+                    } else {
+                        // Swipe right → back (go to previous page)
+                        handleClickBack();
+                    }
+                    return;
+                }
+
+                // Tap (short distance)
+                if (dist <= 5) {
+                    handleClick();
+                }
+            }
+
+            // Mouse events
+            book.addEventListener('mousedown', function (e) {
+                onPointerDown(e.clientX, e.clientY);
+            });
+            book.addEventListener('mouseup', function (e) {
+                onPointerUp(e.clientX, e.clientY);
+            });
+
+            // Touch events
+            book.addEventListener('touchstart', function (e) {
+                var t = e.touches[0];
+                onPointerDown(t.clientX, t.clientY);
+            }, { passive: true });
+            book.addEventListener('touchend', function (e) {
+                var t = e.changedTouches[0];
+                onPointerUp(t.clientX, t.clientY);
+            });
+
+            // ── Menu logic ──────────────────────────────────────
+            var menu = document.getElementById('sideMenu');
+            var toggle = document.getElementById('menuToggle');
+            var searchInput = document.getElementById('searchInput');
+            var searchBtn = document.getElementById('searchBtn');
+            var searchInfo = document.getElementById('searchInfo');
+            var sizeSlider = document.getElementById('sizeSlider');
+            var sizeDisplay = document.getElementById('sizeDisplay');
+            var fontSelect = document.getElementById('fontSelect');
+            var downloadBtn = document.getElementById('downloadBtn');
+
+            // Toggle menu
+            toggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('collapsed');
+                toggle.textContent = menu.classList.contains('collapsed') ? '▶' : '◀';
+            });
+
+            // Start collapsed on small screens
+            if (window.innerWidth < 768) {
+                menu.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
+
+            // Prevent menu clicks from flipping pages
+            menu.addEventListener('click', function (e) { e.stopPropagation(); });
+            menu.addEventListener('touchend', function (e) { e.stopPropagation(); });
+
+            // ── Search ──────────────────────────────────────────
+            function doSearch() {
+                var query = searchInput.value.trim();
+                if (!query) { searchInfo.textContent = ''; return; }
+                var lowerQ = query.toLowerCase();
+                searchResults = [];
+                for (var i = 0; i < allLines.length; i++) {
+                    if (allLines[i].toLowerCase().indexOf(lowerQ) !== -1) {
+                        searchResults.push(allLines[i]);
+                    }
+                }
+
+                searchMode = true;
+                var active = getActiveLines();
+                if (active.length === 0 || (searchResults.length === 0)) {
+                    searchInfo.textContent = 'No results found.';
+                    paginateText(['', '', 'No results found for:', '"' + query + '"']);
+                } else {
+                    searchInfo.textContent = active.length + ' result(s) found.';
+                    paginateText(active);
+                }
+
+                // Navigate to content if not already there
+                contentSpread = 0;
+                if (state === 'content') {
+                    showText(0);
+                } else {
+                    // Jump to open book with results
+                    state = 'content';
+                    setBaseImage('open');
+                    showText(0);
+                }
+            }
+
+            searchBtn.addEventListener('click', doSearch);
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') doSearch();
+            });
+            // Clear search mode when input is emptied
+            searchInput.addEventListener('input', function () {
+                if (searchInput.value.trim() === '' && searchMode) {
+                    searchMode = false;
+                    searchInfo.textContent = '';
+                    paginateText(getActiveLines());
+                    if (state === 'content') {
+                        contentSpread = 0;
+                        showText(0);
+                    }
+                }
+            });
+
+            // ── Text Size ───────────────────────────────────────
+            sizeSlider.value = bookFontSize;
+            sizeDisplay.textContent = bookFontSize + 'px';
+
+            sizeSlider.addEventListener('input', function () {
+                bookFontSize = parseInt(sizeSlider.value);
+                sizeDisplay.textContent = bookFontSize + 'px';
+                paginateText(getActiveLines());
+                if (state === 'content') {
+                    if (contentSpread >= spreads.length) contentSpread = Math.max(0, spreads.length - 1);
+                    showText(contentSpread);
+                }
+            });
+
+            // ── Font ────────────────────────────────────────────
+            fontSelect.addEventListener('change', function () {
+                bookFontFamily = fontSelect.value;
+                paginateText(getActiveLines());
+                if (state === 'content') {
+                    if (contentSpread >= spreads.length) contentSpread = Math.max(0, spreads.length - 1);
+                    showText(contentSpread);
+                }
+            });
+
+            // ── Download ────────────────────────────────────────
+            downloadBtn.addEventListener('click', function () {
+                var a = document.createElement('a');
+                a.href = TEXT_FILE;
+                a.download = 'Tome of Quotes.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
+            // ── Download current text ────────────────────────────
+            var downloadCurrentBtn = document.getElementById('downloadCurrentBtn');
+            downloadCurrentBtn.addEventListener('click', function () {
+                var lines = getActiveLines();
+                var formatted = [];
+                for (var i = 0; i < lines.length; i++) {
+                    formatted.push(formatLinePlain(lines[i]));
+                }
+                var blob = new Blob([formatted.join('\n')], { type: 'text/plain' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'Tome of Quotes - Current.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            // ── Prefix ─────────────────────────────────────────
+            var prefixSelect = document.getElementById('prefixSelect');
+            prefixSelect.addEventListener('change', function () {
+                prefixMode = prefixSelect.value;
+                if (state === 'content') {
+                    showText(contentSpread);
+                }
+            });
+
+            // ── Character Filter ─────────────────────────────────
+            var charFilterEl = document.getElementById('charFilter');
+            charFilterEl.addEventListener('change', function () {
+                charFilterPrefix = charFilterEl.value;
+                var active = getActiveLines();
+                if (active.length === 0) {
+                    active = ['', '', 'No lines for this character.'];
+                }
+                paginateText(active);
+                contentSpread = 0;
+                if (state === 'content') {
+                    showText(0);
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
