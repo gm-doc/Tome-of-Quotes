@@ -173,9 +173,30 @@
             display: flex;
             gap: 6px;
         }
+        .search-row .search-wrap {
+            flex: 1;
+            position: relative;
+            display: flex;
+        }
         .search-row input {
             flex: 1;
+            padding-right: 22px;
         }
+        .search-clear {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #8a6a4a;
+            font-size: 14px;
+            line-height: 1;
+            padding: 0;
+            display: none;
+        }
+        .search-clear:hover { color: #c0392b; }
         .search-row .menu-btn {
             padding: 7px 10px;
             font-size: 12px;
@@ -203,6 +224,21 @@
         .line-prefix:hover {
             background-color: var(--prefix-bg);
             color: var(--prefix-color);
+        }
+        .conv-badge {
+            display: inline-block;
+            border-radius: 3px;
+            padding: 0 3px;
+            margin-left: 3px;
+            font-size: 0.8em;
+            background: #5a3e28;
+            color: #e8d9b0;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .conv-badge:hover {
+            background: #7a5a3a;
         }
 
         .scene {
@@ -315,7 +351,10 @@
         <div class="menu-section">
             <label>Search</label>
             <div class="search-row">
-                <input type="text" id="searchInput" placeholder="Search text...">
+                <div class="search-wrap">
+                    <input type="text" id="searchInput" placeholder="Search text...">
+                    <button class="search-clear" id="searchClear" tabindex="-1">&times;</button>
+                </div>
                 <button class="menu-btn" id="searchBtn">Go</button>
             </div>
             <div class="search-info" id="searchInfo"></div>
@@ -494,7 +533,7 @@
             var pageW = Math.round(bw * 0.317 - bw * 0.02);
             var pageH = Math.round(bh * 0.508 - bh * 0.01);
 
-            // Measure one line height using a separate unsized element
+            // Measure one line height
             var liner = document.createElement('div');
             liner.style.cssText =
                 'position:absolute; visibility:hidden;' +
@@ -508,7 +547,8 @@
             var lineH = liner.offsetHeight;
             document.body.removeChild(liner);
 
-            var linesPerPage = Math.max(1, Math.floor(pageH / lineH));
+            // Subtract 1 line as safety margin for occasional word-wrap
+            var linesPerPage = Math.max(1, Math.floor(pageH / lineH) - 1);
 
             // Build spreads: each has a left page + right page
             spreads = [];
@@ -567,6 +607,15 @@
             var prefix3 = eventName.substring(0, 3).toLowerCase();
             var charInfo = CHAR_MAP[prefix3];
 
+            // Detect conversation events and extract the conversation key.
+            // Event format: pXX_<conversationKey>_X_NN  e.g. pwh_wizard_tower_conversation_eight_d_01
+            // Key = everything after the 4-char char-prefix (pXX_) up to the last _X_NN suffix.
+            var convKey = null;
+            var convMatch = eventName.match(/^[a-z]{3}_(.+_conversation_.+?)(?:_[a-z]_\d+|_\d+)?$/i);
+            if (convMatch) {
+                convKey = convMatch[1]; // e.g. "wizard_tower_conversation_eight"
+            }
+
             var prefixText;
             if (prefixMode === 'event') {
                 prefixText = escapeHtml(eventName);
@@ -578,13 +627,19 @@
                 prefixText = escapeHtml(eventName);
             }
 
+            var convBadge = '';
+            if (convKey) {
+                var badgeLabel = (prefixMode === 'initials' || prefixMode === 'event') ? '[C]' : '[CONV]';
+                convBadge = '<span class="conv-badge" data-conv-key="' + escapeHtml(convKey) + '">' + badgeLabel + '</span>';
+            }
+
             if (charInfo) {
                 var textCol = charInfo.textColor || '#ffffff';
                 return '<span class="line-prefix" data-char="' + prefix3 + '" '
                     + 'style="--prefix-bg:' + charInfo.color + '; --prefix-color:' + textCol + ';"'
-                    + '>' + prefixText + '</span>' + escapeHtml(dialogue);
+                    + '>' + prefixText + '</span>' + convBadge + escapeHtml(dialogue);
             }
-            return prefixText + escapeHtml(dialogue);
+            return prefixText + convBadge + escapeHtml(dialogue);
         }
 
         function formatLines(text) {
@@ -675,8 +730,19 @@
                 layer.appendChild(flipRightText);
             }
 
+            // Add old left text to the flip layer when going back so it rotates away
+            if (closing && opts.oldLeftText) {
+                var flipLeftText = document.createElement('div');
+                flipLeftText.className = 'page-text left';
+                flipLeftText.style.pointerEvents = 'none';
+                flipLeftText.style.fontFamily = bookFontFamily;
+                flipLeftText.style.fontSize = bookFontSize + 'px';
+                flipLeftText.innerHTML = formatLines(opts.oldLeftText);
+                layer.appendChild(flipLeftText);
+            }
+
             var clip = closing
-                ? 'inset(0 50% 0 0)'
+                ? 'inset(0 50% 28% 0)'
                 : 'inset(0 0 0 50%)';
             layer.style.clipPath = clip;
             layer.style.webkitClipPath = clip;
@@ -777,6 +843,11 @@
                         textR.innerHTML = formatLines(sp2.right);
                         textR.style.fontFamily = bookFontFamily;
                         textR.style.fontSize = bookFontSize + 'px';
+                        if (closing) {
+                            textL.innerHTML = formatLines(sp2.left);
+                            textL.style.fontFamily = bookFontFamily;
+                            textL.style.fontSize = bookFontSize + 'px';
+                        }
                     }
                 }
                 if (opts.showFirstPageText) {
@@ -948,20 +1019,25 @@
                 case 'content':
                     if (contentSpread > 0) {
                         var prevSpread = contentSpread - 1;
+                        var curSp = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'open',
                             direction: 'back',
                             newText: { spreadIdx: prevSpread },
+                            oldLeftText: curSp ? curSp.left : '',
                             onDone: function () { contentSpread = prevSpread; }
                         });
                     } else {
                         // Back to first page
+                        var curSp2 = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'firstPage',
                             direction: 'back',
-                            onDone: function () { state = 'first_page'; showFirstPage(); }
+                            oldLeftText: curSp2 ? curSp2.left : '',
+                            showFirstPageText: true,
+                            onDone: function () { state = 'first_page'; }
                         });
                     }
                     break;
@@ -994,14 +1070,22 @@
                 if (state === 'content') showText(oldSpreadIdx);
             });
             // ── Pointer / touch interaction ─────────────────────
-            var pointerDown = null; // { x, y }
+            var pointerDown = null; // { x, y, target }
 
-            function onPointerDown(x, y) {
-                pointerDown = { x: x, y: y };
+            function onPointerDown(x, y, target) {
+                pointerDown = { x: x, y: y, target: target };
             }
 
-            function onPointerUp(x, y) {
+            function isConvBadge(el) {
+                return el && (el.classList.contains('conv-badge') || (el.closest && el.closest('.conv-badge')));
+            }
+
+            function onPointerUp(x, y, target) {
                 if (!pointerDown) return;
+                if (isConvBadge(pointerDown.target) || isConvBadge(target)) {
+                    pointerDown = null;
+                    return;
+                }
                 var dx = x - pointerDown.x;
                 var dy = y - pointerDown.y;
                 var dist = Math.sqrt(dx * dx + dy * dy);
@@ -1023,35 +1107,94 @@
                     return;
                 }
 
-                // Tap (short distance)
+                // Tap (short distance) — left side goes back, right side goes forward
                 if (dist <= 5) {
-                    handleClick();
+                    var bookRect = book.getBoundingClientRect();
+                    var midX = bookRect.left + bookRect.width / 2;
+                    if (x < midX) {
+                        handleClickBack();
+                    } else {
+                        handleClick();
+                    }
                 }
             }
 
             // Mouse events
             book.addEventListener('mousedown', function (e) {
-                onPointerDown(e.clientX, e.clientY);
+                onPointerDown(e.clientX, e.clientY, e.target);
             });
             book.addEventListener('mouseup', function (e) {
-                onPointerUp(e.clientX, e.clientY);
+                onPointerUp(e.clientX, e.clientY, e.target);
             });
 
             // Touch events
             book.addEventListener('touchstart', function (e) {
                 var t = e.touches[0];
-                onPointerDown(t.clientX, t.clientY);
+                onPointerDown(t.clientX, t.clientY, t.target);
             }, { passive: true });
             book.addEventListener('touchend', function (e) {
                 var t = e.changedTouches[0];
-                onPointerUp(t.clientX, t.clientY);
+                onPointerUp(t.clientX, t.clientY, t.target);
             });
+
+            // ── Conversation badge click ─────────────────────────
+            function onTextClick(e) {
+                var badge = e.target.closest ? e.target.closest('.conv-badge') : null;
+                if (!badge && e.target.classList.contains('conv-badge')) badge = e.target;
+                if (!badge) return;
+                e.stopPropagation();
+                var key = badge.getAttribute('data-conv-key');
+                if (!key) return;
+                searchInput.value = key;
+                searchClear.style.display = 'block';
+                searchMode = true;
+                var lowerKey = key.toLowerCase();
+                searchResults = [];
+                // Match by exact extracted conversation key to avoid e.g. "eight" matching "eighteen"
+                for (var k = 0; k < allLines.length; k++) {
+                    var ci = allLines[k].indexOf(': ');
+                    if (ci === -1) continue;
+                    var evn = allLines[k].substring(0, ci);
+                    var km = evn.match(/^[a-z]{3}_(.+_conversation_.+?)(?:_[a-z]_\d+|_\d+)?$/i);
+                    if (km && km[1].toLowerCase() === lowerKey) {
+                        searchResults.push(allLines[k]);
+                    }
+                }
+                // Sort by event name excluding the pXX_ character prefix
+                searchResults.sort(function (a, b) {
+                    var aName = a.indexOf(': ') !== -1 ? a.substring(0, a.indexOf(': ')) : a;
+                    var bName = b.indexOf(': ') !== -1 ? b.substring(0, b.indexOf(': ')) : b;
+                    // Strip leading pXX_ (3 chars + underscore)
+                    var aKey = aName.length > 4 ? aName.substring(4) : aName;
+                    var bKey = bName.length > 4 ? bName.substring(4) : bName;
+                    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+                });
+                var active = getActiveLines();
+                if (active.length === 0) {
+                    searchInfo.textContent = 'No results found.';
+                    paginateText(['', '', 'No results found for:', '"' + key + '"']);
+                } else {
+                    searchInfo.textContent = active.length + ' result(s) found.';
+                    paginateText(active);
+                }
+                contentSpread = 0;
+                if (state === 'content') {
+                    showText(0);
+                } else {
+                    state = 'content';
+                    setBaseImage('open');
+                    showText(0);
+                }
+            }
+            textL.addEventListener('click', onTextClick);
+            textR.addEventListener('click', onTextClick);
 
             // ── Menu logic ──────────────────────────────────────
             var menu = document.getElementById('sideMenu');
             var toggle = document.getElementById('menuToggle');
             var searchInput = document.getElementById('searchInput');
             var searchBtn = document.getElementById('searchBtn');
+            var searchClear = document.getElementById('searchClear');
             var searchInfo = document.getElementById('searchInfo');
             var sizeSlider = document.getElementById('sizeSlider');
             var sizeDisplay = document.getElementById('sizeDisplay');
@@ -1113,8 +1256,8 @@
             searchInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') doSearch();
             });
-            // Clear search mode when input is emptied
             searchInput.addEventListener('input', function () {
+                searchClear.style.display = searchInput.value ? 'block' : 'none';
                 if (searchInput.value.trim() === '' && searchMode) {
                     searchMode = false;
                     searchInfo.textContent = '';
@@ -1124,6 +1267,20 @@
                         showText(0);
                     }
                 }
+            });
+            searchClear.addEventListener('click', function () {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                if (searchMode) {
+                    searchMode = false;
+                    searchInfo.textContent = '';
+                    paginateText(getActiveLines());
+                    if (state === 'content') {
+                        contentSpread = 0;
+                        showText(0);
+                    }
+                }
+                searchInput.focus();
             });
 
             // ── Text Size ───────────────────────────────────────
