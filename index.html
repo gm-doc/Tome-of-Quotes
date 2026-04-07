@@ -14,10 +14,15 @@
             background: #0a0a0a;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             overflow: hidden;
             font-family: 'Times New Roman', serif;
+        }
+
+        .scene {
+            position: relative;
+            transform: translateY(-8vh);
         }
 
         /* ── Side Menu ─────────────────────────────────────────── */
@@ -245,15 +250,15 @@
             perspective: 2000px;
         }
 
-        .book {
-            position: relative;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            transition: filter 0.2s;
+        body {
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Times New Roman', serif;
         }
-
-        .book:hover {
             filter: brightness(1.06);
         }
 
@@ -348,6 +353,7 @@
         <h2>⚙ Tome Tools</h2>
         <hr class="menu-divider">
 
+
         <div class="menu-section">
             <label>Search</label>
             <div class="search-row">
@@ -356,6 +362,10 @@
                     <button class="search-clear" id="searchClear" tabindex="-1">&times;</button>
                 </div>
                 <button class="menu-btn" id="searchBtn">Go</button>
+            </div>
+            <div style="margin-top:6px; display:flex; align-items:center; gap:7px;">
+                <input type="checkbox" id="hideEventRefs" checked style="accent-color:#c4a265;">
+                <label for="hideEventRefs" style="color:#a08050; font-size:12px; cursor:pointer; user-select:none;">Hide event references</label>
             </div>
             <div class="search-info" id="searchInfo"></div>
         </div>
@@ -510,11 +520,30 @@
                 });
         }
 
+
+        // Hide event references logic
+        function isEventReferenceLine(line) {
+            // Looks for lines like: ...: "<event_name>"
+            var colonIdx = line.indexOf(': ');
+            if (colonIdx === -1) return false;
+            var dialogue = line.substring(colonIdx + 2).trim();
+            return dialogue.startsWith('"<') && dialogue.endsWith('>"');
+        }
+
         function filterByChar(lines) {
-            if (charFilterPrefix === 'all') return lines;
-            return lines.filter(function (line) {
-                return line.substring(0, 3).toLowerCase() === charFilterPrefix;
-            });
+            var filtered = lines;
+            if (charFilterPrefix !== 'all') {
+                filtered = filtered.filter(function (line) {
+                    return line.substring(0, 3).toLowerCase() === charFilterPrefix;
+                });
+            }
+            // Hide event references if checkbox is checked
+            if (window.hideEventRefsChecked) {
+                filtered = filtered.filter(function(line) {
+                    return !isEventReferenceLine(line);
+                });
+            }
+            return filtered;
         }
 
         function getActiveLines() {
@@ -570,7 +599,7 @@
             if (!openW || !openH) return;
             var vw = window.innerWidth * 0.98;
             var vh = window.innerHeight * 0.96;
-            var s = Math.min(vw / openW, vh / openH);
+            var s = Math.min(vw / openW, vh / openH) * 1.4;
             book.style.width  = Math.round(openW * s) + 'px';
             book.style.height = Math.round(openH * s) + 'px';
         }
@@ -1057,6 +1086,9 @@
         }
 
         // ── Init ────────────────────────────────────────────────
+        // Track hide event refs state globally
+        window.hideEventRefsChecked = true;
+
         Promise.all([preloadImages(), loadText()]).then(function () {
             setBaseImage('closed');
             clearText();
@@ -1200,6 +1232,16 @@
             var sizeDisplay = document.getElementById('sizeDisplay');
             var fontSelect = document.getElementById('fontSelect');
             var downloadBtn = document.getElementById('downloadBtn');
+            var hideEventRefs = document.getElementById('hideEventRefs');
+            // Hide event references checkbox
+            hideEventRefs.addEventListener('change', function() {
+                window.hideEventRefsChecked = hideEventRefs.checked;
+                paginateText(getActiveLines());
+                if (state === 'content') {
+                    contentSpread = 0;
+                    showText(0);
+                }
+            });
 
             // Toggle menu
             toggle.addEventListener('click', function (e) {
@@ -1291,9 +1333,10 @@
                 bookFontSize = parseInt(sizeSlider.value);
                 sizeDisplay.textContent = bookFontSize + 'px';
                 paginateText(getActiveLines());
+                // Always reset to first page after resizing to avoid truncation bugs
+                contentSpread = 0;
                 if (state === 'content') {
-                    if (contentSpread >= spreads.length) contentSpread = Math.max(0, spreads.length - 1);
-                    showText(contentSpread);
+                    showText(0);
                 }
             });
 
