@@ -228,6 +228,37 @@
             margin: 2px 0;
         }
 
+        /* ── Checkbox styling ───────────────────────── */
+        .menu input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #7a5a2a;
+            border-radius: 3px;
+            background: #1a1209;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+            vertical-align: middle;
+        }
+        .menu input[type="checkbox"]:checked {
+            background: #c4a265;
+            border-color: #c4a265;
+        }
+        .menu input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: -1px;
+            width: 4px;
+            height: 8px;
+            border: 2px solid #1a1209;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg);
+        }
+
         /* ── Line prefix highlighting ───────────────────── */
         .line-prefix {
             border-radius: 3px;
@@ -273,10 +304,6 @@
             position: relative;
             cursor: pointer;
         }
-        .book:hover {
-            filter: brightness(1.06);
-        }
-
         .book.busy {
             pointer-events: none;
         }
@@ -412,11 +439,11 @@
                 <button class="menu-btn" id="searchBtn">Go</button>
             </div>
             <div style="margin-top:6px; display:flex; align-items:center; gap:7px;">
-                <input type="checkbox" id="hideUnknownChars" checked style="accent-color:#c4a265;">
+                <input type="checkbox" id="hideUnknownChars" checked>
                 <label for="hideUnknownChars" style="color:#a08050; font-size:12px; cursor:pointer; user-select:none;">Hide unknown characters</label>
             </div>
             <div style="margin-top:4px; display:flex; align-items:center; gap:7px;">
-                <input type="checkbox" id="hideEventRefs" checked style="accent-color:#c4a265;">
+                <input type="checkbox" id="hideEventRefs" checked>
                 <label for="hideEventRefs" style="color:#a08050; font-size:12px; cursor:pointer; user-select:none;">Hide event references</label>
             </div>
             <div class="search-info" id="searchInfo"></div>
@@ -542,8 +569,12 @@
             pes: { name: 'Kruber',    initials: 'MK', color: '#2e6da4' },
             pwe: { name: 'Kerillian', initials: 'K',  color: '#27ae60' },
             pdr: { name: 'Bardin',    initials: 'BG', color: '#1a6e3a' },
+            pbr: { name: 'Bardin',    initials: 'BG', color: '#1a6e3a' },
+            pwb: { name: 'Sienna',    initials: 'SF', color: '#c0392b' },
             // Extended prefixes
             nfl: { name: 'Franz Lohner', initials: 'FL', color: '#bfa76f' },
+            nik: { name: 'Franz Lohner', initials: 'FL', color: '#bfa76f' },
+            npces: { name: 'Franz Lohner', initials: 'FL', color: '#bfa76f' },
             ebh: { name: 'Burblespue Halescourge', initials: 'BH', color: '#7e57c2' },
             ecc: { name: 'Bödvarr Ribspreader', initials: 'BR', color: '#a0522d' },
             egs: { name: 'Rasknitt', initials: 'RN', color: '#607d8b' },
@@ -563,7 +594,8 @@
             npcr1: { name: 'Dwarven Heroes', initials: 'DH', color: '#b0bec5' },
             npp: { name: 'Catrinne of Aldenstein', initials: 'CA', color: '#f06292' },
             nsf: { name: 'Sofia Fuegonasus', initials: 'SOF', color: '#ffb300' },
-            nde: { name: 'Hedda Bardinsdottir', initials: 'HB', color: '#b8860b' }
+            nde: { name: 'Hedda Bardinsdottir', initials: 'HB', color: '#b8860b' },
+            vmg: { name: 'Versus Skaven', initials: 'VS', color: '#616161' }
         };
 
         // States: 'closed' | 'first_page' | 'content' | 'last_page'
