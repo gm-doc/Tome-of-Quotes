@@ -1078,9 +1078,11 @@
             + 'ripped directly from the Wwise sound engine. Each line is prefixed with its original sound event name.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
             + '<div style="text-align:center; margin-bottom:4px;"><b>Menu Options:</b></div>'
-            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
-            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>View</b> &ndash; Switch between Tome (book) and Reader (mobile) view.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword. Checkboxes hide unknown characters or event reference placeholders.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by character: heroes, NPCs, bosses, enemies, and more.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Text Size</b> &ndash; Adjust the font size.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
@@ -1093,9 +1095,13 @@
             + 'ripped directly from the Wwise sound engine. Each line is prefixed with its original sound event name.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
             + '<div style="text-align:center; margin-bottom:4px;"><b>Menu Options:</b></div>'
-            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
-            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>View</b> &ndash; Switch between Tome (book) and Reader (mobile) view.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Alignment</b> &ndash; Toggle left or centre text alignment (Reader only).</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Theme</b> &ndash; Switch between light and dark background (Reader only).</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword. Checkboxes hide unknown characters or event reference placeholders.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by character: heroes, NPCs, bosses, enemies, and more.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Text Size</b> &ndash; Adjust the font size.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
             + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
@@ -1712,6 +1718,7 @@
             if (window.innerWidth < 768) {
                 menu.classList.add('collapsed');
                 toggle.textContent = '▶';
+                updateReaderPosition();
             }
 
             // Prevent menu clicks from flipping pages
