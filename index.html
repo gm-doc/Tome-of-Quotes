@@ -34,7 +34,7 @@
             height: 100vh;
             background: linear-gradient(135deg, #1a1209 0%, #2a1a0a 50%, #1a1209 100%);
             border-right: 2px solid #5a3a1a;
-            z-index: 100;
+            z-index: 300;
             display: flex;
             flex-direction: column;
             padding: 18px 16px;
@@ -144,6 +144,15 @@
         }
         .menu select:focus {
             border-color: #c4a265;
+        }
+        .menu select option {
+            background: #0e0a05;
+            color: #d4b87a;
+        }
+        .menu select optgroup {
+            background: #1a1209;
+            color: #c4a265;
+            font-style: normal;
         }
         .menu-btn {
             background: linear-gradient(180deg, #3a2a1a 0%, #2a1a0a 100%);
@@ -259,6 +268,12 @@
             overflow: hidden;
             font-family: 'Times New Roman', serif;
         }
+
+        .book {
+            position: relative;
+            cursor: pointer;
+        }
+        .book:hover {
             filter: brightness(1.06);
         }
 
@@ -279,7 +294,8 @@
             position: absolute;
             overflow: hidden;
             color: #2a1a0a;
-            font-size: 0.82em;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
             line-height: 1.45;
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -293,16 +309,18 @@
             top: 14.6%;
             left: 15.6%;
             width: 31.7%;
-            height: 50.8%;
+            height: 51%;
             padding: 0.5% 1%;
         }
         .page-text.right {
-            top: 15.6%;
-            left: 54.2%;
-            width: 32.7%;
-            height: 50.8%;
+            top: 14.6%;
+            left: 54.5%;
+            width: 31.7%;
+            height: 51%;
             padding: 0.5% 1%;
         }
+
+
 
         /* ── Flip animation layers ─────────────────────────────── */
         .flip-layer {
@@ -343,6 +361,17 @@
             pointer-events: none;
             z-index: 3;
         }
+
+        #mobileReader {
+            top: 0; right: 0; bottom: 0; left: 0;
+            transition: left 0.35s ease, background 0.3s ease;
+        }
+        #mobileReader.reader-shifted {
+            left: 260px;
+        }
+        #mobileReaderText {
+            transition: color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -353,6 +382,25 @@
         <h2>⚙ Tome Tools</h2>
         <hr class="menu-divider">
 
+        <div class="menu-section" style="flex-direction:row; align-items:center; justify-content:space-between;">
+            <label style="margin:0;">View</label>
+            <div style="display:flex; gap:4px;">
+                <button class="menu-btn" id="modeTomeBtn" style="padding:5px 10px; font-size:12px;">Tome</button>
+                <button class="menu-btn" id="modeReaderBtn" style="padding:5px 10px; font-size:12px;">Reader</button>
+            </div>
+        </div>
+        <hr class="menu-divider">
+
+        <div class="menu-section" id="readerAlignSection" style="display:none; flex-direction:row; align-items:center; justify-content:space-between;">
+            <label style="margin:0;">Alignment</label>
+            <button class="menu-btn" id="readerAlignBtn" style="padding:5px 10px; font-size:12px;">Left</button>
+        </div>
+
+        <div class="menu-section" id="readerDarkSection" style="display:none; flex-direction:row; align-items:center; justify-content:space-between;">
+            <label style="margin:0;">Theme</label>
+            <button class="menu-btn" id="readerDarkBtn" style="padding:5px 10px; font-size:12px;">Light</button>
+        </div>
+        <hr class="menu-divider" id="readerDarkDivider" style="display:none;">
 
         <div class="menu-section">
             <label>Search</label>
@@ -364,6 +412,10 @@
                 <button class="menu-btn" id="searchBtn">Go</button>
             </div>
             <div style="margin-top:6px; display:flex; align-items:center; gap:7px;">
+                <input type="checkbox" id="hideUnknownChars" checked style="accent-color:#c4a265;">
+                <label for="hideUnknownChars" style="color:#a08050; font-size:12px; cursor:pointer; user-select:none;">Hide unknown characters</label>
+            </div>
+            <div style="margin-top:4px; display:flex; align-items:center; gap:7px;">
                 <input type="checkbox" id="hideEventRefs" checked style="accent-color:#c4a265;">
                 <label for="hideEventRefs" style="color:#a08050; font-size:12px; cursor:pointer; user-select:none;">Hide event references</label>
             </div>
@@ -376,11 +428,41 @@
             <label>Character</label>
             <select id="charFilter">
                 <option value="all" selected>All</option>
-                <option value="pes">Kruber</option>
-                <option value="pwh">Saltzpyre</option>
-                <option value="pbw">Sienna</option>
-                <option value="pwe">Kerillian</option>
-                <option value="pdr">Bardin</option>
+                <optgroup label="Ubersreik Five">
+                    <option value="u5">All Five</option>
+                    <option value="pes">Kruber</option>
+                    <option value="pwh">Saltzpyre</option>
+                    <option value="pbw">Sienna</option>
+                    <option value="pwe">Kerillian</option>
+                    <option value="pdr">Bardin</option>
+                </optgroup>
+                <optgroup label="NPCs">
+                    <option value="nfl">Franz Lohner</option>
+                    <option value="nco">Cousin Okri</option>
+                    <option value="npp">Catrinne of Aldenstein</option>
+                    <option value="nsf">Sofia Fuegonasus</option>
+                    <option value="nde">Hedda Bardinsdottir</option>
+                </optgroup>
+                <optgroup label="Bosses">
+                    <option value="ebh">Burblespue Halescourge</option>
+                    <option value="egs">Rasknitt</option>
+                    <option value="ecc">Bödvarr Ribspreader</option>
+                    <option value="ewl">Skarrik Spinemanglr</option>
+                    <option value="nngl">Nurgloth the Eternal</option>
+                </optgroup>
+                <optgroup label="Enemies">
+                    <option value="egt">Gutter Runner</option>
+                    <option value="epg">Globadier</option>
+                    <option value="epm">Packmaster</option>
+                    <option value="erg">Ratling Gunner</option>
+                    <option value="ewt">Warpfire Thrower</option>
+                </optgroup>
+                <optgroup label="Misc">
+                    <option value="ncv">Villager</option>
+                    <option value="ndw">Nameless Voice</option>
+                    <option value="npcr1">Dwarven Heroes</option>
+                    <option value="unknown">Unknown</option>
+                </optgroup>
             </select>
         </div>
 
@@ -398,29 +480,8 @@
         <hr class="menu-divider">
 
         <div class="menu-section">
-            <label>Font</label>
-            <select id="fontSelect">
-                <option value="'Caveat', cursive">Caveat</option>
-                <option value="'Dancing Script', cursive">Dancing Script</option>
-                <option value="'Shadows Into Light', cursive">Shadows Into Light</option>
-                <option value="'Patrick Hand', cursive">Patrick Hand</option>
-                <option value="'Indie Flower', cursive">Indie Flower</option>
-                <option value="'Kalam', cursive">Kalam</option>
-                <option value="'Palatino Linotype', 'Book Antiqua', Palatino, serif">Palatino</option>
-                <option value="Georgia, serif">Georgia</option>
-                <option value="'Times New Roman', serif" selected>Times New Roman</option>
-                <option value="'Courier New', monospace">Courier New</option>
-            </select>
-        </div>
-
-        <hr class="menu-divider">
-
-        <div class="menu-section">
-            <label>Text Size</label>
-            <div class="slider-row">
-                <input type="range" id="sizeSlider" min="8" max="28" value="12">
-                <span class="size-display" id="sizeDisplay">12px</span>
-            </div>
+            <label>Text Size &nbsp;<span id="fontSizeDisplay" style="color:#c4a265;">14px</span></label>
+            <input type="range" id="fontSizeSlider" min="8" max="34" step="1" value="14">
         </div>
 
         <hr class="menu-divider">
@@ -444,6 +505,19 @@
         </div>
     </div>
 
+    <!-- ── Mobile Reader ─────────────────────────────────── -->
+    <div id="mobileReader" style="display:none; position:fixed; z-index:200; background:#f0e0c0; flex-direction:column;">
+        <div style="display:flex; align-items:center; justify-content:center; padding:8px 12px; background:#2a1a0a; border-bottom:2px solid #5a3a1a; flex-shrink:0;">
+            <span style="color:#c4a265; font-family:'Palatino Linotype',serif; font-size:15px; font-weight:bold; letter-spacing:1px;">Tome of Quotes</span>
+        </div>
+        <div id="mobileReaderText" style="flex:1; overflow:hidden; padding:14px 16px; color:#2a1a0a; white-space:pre-wrap; word-wrap:break-word; line-height:1.45; font-family:'Times New Roman',serif; user-select:text; -webkit-user-select:text;"></div>
+        <div style="display:flex; align-items:center; padding:8px 12px; background:#2a1a0a; border-top:2px solid #5a3a1a; gap:8px; flex-shrink:0;">
+            <button id="mobilePrev" style="background:#3a2a1a; border:1px solid #5a3a1a; color:#c4a265; padding:7px 18px; border-radius:4px; font-size:18px; cursor:pointer;">&#9664;</button>
+            <span id="mobilePageLabel" style="flex:1; text-align:center; color:#a08050; font-size:12px; font-family:'Palatino Linotype',serif;"></span>
+            <button id="mobileNext" style="background:#3a2a1a; border:1px solid #5a3a1a; color:#c4a265; padding:7px 18px; border-radius:4px; font-size:18px; cursor:pointer;">&#9654;</button>
+        </div>
+    </div>
+
     <script>
     (function () {
         var IMAGES = {
@@ -455,8 +529,8 @@
 
         var TEXT_FILE = 'Tome of Quotes.txt';
         var allLines = [];   // raw lines from file
-        var bookFontSize = 12;  // px
-        var bookFontFamily = "'Times New Roman', serif";
+        var FONT_SIZE = 14;   // matches CSS default
+        var FONT_FAMILY = "'Times New Roman', serif";  // fixed, matches CSS
         var searchMode = false;
         var searchResults = [];
         var prefixMode = 'name'; // 'event' | 'name' | 'initials'
@@ -467,14 +541,43 @@
             pwh: { name: 'Saltzpyre', initials: 'VS', color: '#1a1a1a', textColor: '#ffffff' },
             pes: { name: 'Kruber',    initials: 'MK', color: '#2e6da4' },
             pwe: { name: 'Kerillian', initials: 'K',  color: '#27ae60' },
-            pdr: { name: 'Bardin',    initials: 'BG', color: '#1a6e3a' }
+            pdr: { name: 'Bardin',    initials: 'BG', color: '#1a6e3a' },
+            // Extended prefixes
+            nfl: { name: 'Franz Lohner', initials: 'FL', color: '#bfa76f' },
+            ebh: { name: 'Burblespue Halescourge', initials: 'BH', color: '#7e57c2' },
+            ecc: { name: 'Bödvarr Ribspreader', initials: 'BR', color: '#a0522d' },
+            egs: { name: 'Rasknitt', initials: 'RN', color: '#607d8b' },
+            egt: { name: 'Gutter Runner', initials: 'GR', color: '#616161' },
+            epg: { name: 'Globadier', initials: 'GB', color: '#388e3c' },
+            epm: { name: 'Packmaster', initials: 'PM', color: '#8d6e63' },
+            erg: { name: 'Ratling Gunner', initials: 'RG', color: '#455a64' },
+            ewl: { name: 'Skarrik Spinemanglr', initials: 'SS', color: '#bdb76b' },
+            ewt: { name: 'Warpfire Thrower', initials: 'WT', color: '#ff7043' },
+            nco: { name: 'Cousin Okri', initials: 'CO', color: '#ffd700' },
+            ncv: { name: 'Villager', initials: 'CV', color: '#bdbdbd' },
+            ncv1: { name: 'Villager', initials: 'CV', color: '#bdbdbd' },
+            ncv2: { name: 'Villager', initials: 'CV', color: '#bdbdbd' },
+            ndw: { name: 'Nameless Voice', initials: 'NV', color: '#607d8b' },
+            nwd: { name: 'Nameless Voice', initials: 'NV', color: '#607d8b' },
+            nngl: { name: 'Nurgloth the Eternal', initials: 'NE', color: '#388e3c' },
+            npcr1: { name: 'Dwarven Heroes', initials: 'DH', color: '#b0bec5' },
+            npp: { name: 'Catrinne of Aldenstein', initials: 'CA', color: '#f06292' },
+            nsf: { name: 'Sofia Fuegonasus', initials: 'SOF', color: '#ffb300' },
+            nde: { name: 'Hedda Bardinsdottir', initials: 'HB', color: '#b8860b' }
         };
 
         // States: 'closed' | 'first_page' | 'content' | 'last_page'
         var state = 'closed';
         var contentSpread = 0;   // which two-page spread we're on (0-based)
-        var spreads = [];        // array of { left: string, right: string }
+        var lineStarts = [0];    // lineStarts[i] = index in active lines where spread i starts
+        var lastContentSpread = 0; // updated when we know the last spread
         var busy = false;
+        var viewMode = 'tome'; // 'tome' | 'reader' — set after init
+        var readerCentered = false;
+        var readerDark = false;
+        var savedLineIdx = -1; // remembered position when switching views (-1 = initial/intro state)
+        var mobilePageStarts = [0];
+        var mobilePage = 0;
 
         var book     = document.getElementById('book');
         var baseImg  = document.getElementById('baseImg');
@@ -511,12 +614,12 @@
                 })
                 .then(function (raw) {
                     allLines = raw.split(/\r?\n/);
-                    paginateText(getActiveLines());
+                    resetPagination();
                 })
                 .catch(function (err) {
                     console.error(err);
                     allLines = ['', '', 'Error: Could not load text file.', err.message];
-                    paginateText(allLines);
+                    resetPagination();
                 });
         }
 
@@ -530,11 +633,40 @@
             return dialogue.startsWith('"<') && dialogue.endsWith('>"');
         }
 
+        var ALL_PREFIXES = Object.keys(CHAR_MAP);
+        var U5_PREFIXES = ['pes','pwh','pbw','pwe','pdr'];
+        var MULTI_PREFIXES = { ncv: ['ncv','ncv1','ncv2'], ndw: ['ndw','nwd'] };
+
+        function getLinePrefix(line) {
+            var underIdx = line.indexOf('_');
+            var colonIdx = line.indexOf(': ');
+            var end = (underIdx !== -1 && (colonIdx === -1 || underIdx < colonIdx)) ? underIdx : colonIdx;
+            return end !== -1 ? line.substring(0, end).toLowerCase() : '';
+        }
+
         function filterByChar(lines) {
             var filtered = lines;
-            if (charFilterPrefix !== 'all') {
-                filtered = filtered.filter(function (line) {
-                    return line.substring(0, 3).toLowerCase() === charFilterPrefix;
+            if (charFilterPrefix === 'u5') {
+                filtered = filtered.filter(function(line) {
+                    return U5_PREFIXES.includes(getLinePrefix(line));
+                });
+            } else if (charFilterPrefix === 'unknown') {
+                filtered = filtered.filter(function(line) {
+                    var p = getLinePrefix(line);
+                    return p && !CHAR_MAP[p];
+                });
+            } else if (charFilterPrefix !== 'all') {
+                var allowed = MULTI_PREFIXES[charFilterPrefix] || [charFilterPrefix];
+                filtered = filtered.filter(function(line) {
+                    return allowed.includes(getLinePrefix(line));
+                });
+            }
+            // Hide unknown characters if checkbox is checked
+            if (window.hideUnknownCharsChecked) {
+                filtered = filtered.filter(function(line) {
+                    var p = getLinePrefix(line);
+                    if (!p) return true;
+                    return !!CHAR_MAP[p];
                 });
             }
             // Hide event references if checkbox is checked
@@ -555,43 +687,42 @@
             return filterByChar(allLines);
         }
 
-        function paginateText(lines) {
-            // Measure how many lines fit in one page area.
-            var bw = book.offsetWidth;
-            var bh = book.offsetHeight;
-            var pageW = Math.round(bw * 0.317 - bw * 0.02);
-            var pageH = Math.round(bh * 0.508 - bh * 0.01);
-
-            // Measure one line height
-            var liner = document.createElement('div');
-            liner.style.cssText =
-                'position:absolute; visibility:hidden;' +
-                'white-space:pre-wrap; word-wrap:break-word;' +
-                'width:' + pageW + 'px;' +
-                'font-family:' + bookFontFamily + ';' +
-                'font-size:' + bookFontSize + 'px;' +
-                'line-height:1.45;';
-            liner.textContent = 'X';
-            document.body.appendChild(liner);
-            var lineH = liner.offsetHeight;
-            document.body.removeChild(liner);
-
-            // Subtract 1 line as safety margin for occasional word-wrap
-            var linesPerPage = Math.max(1, Math.floor(pageH / lineH) - 1);
-
-            // Build spreads: each has a left page + right page
-            spreads = [];
-            var i = 0;
-            while (i < lines.length) {
-                var leftLines  = lines.slice(i, i + linesPerPage);
-                i += linesPerPage;
-                var rightLines = lines.slice(i, i + linesPerPage);
-                i += linesPerPage;
-                spreads.push({
-                    left:  leftLines.join('\n'),
-                    right: rightLines.join('\n')
-                });
+        // ── Fill-then-trim pagination ────────────────────────
+        // Ask the browser whether content fits rather than guessing line heights.
+        function fillPageDiv(div, lines, startIdx) {
+            if (startIdx >= lines.length) {
+                div.innerHTML = '';
+                return lines.length;
             }
+            var maxH = div.clientHeight;
+            var lo = 1, hi = Math.min(lines.length - startIdx, 400), best = 1;
+            while (lo <= hi) {
+                var mid = (lo + hi) >> 1;
+                div.innerHTML = lines.slice(startIdx, startIdx + mid).map(formatLine).join('\n');
+                if (div.scrollHeight <= maxH) { best = mid; lo = mid + 1; }
+                else { hi = mid - 1; }
+            }
+            div.innerHTML = lines.slice(startIdx, startIdx + best).map(formatLine).join('\n');
+            return startIdx + best;
+        }
+
+        // Fill the current spread and cache the start of the next one.
+        // Returns true if this is the last spread.
+        function fillSpread(spreadIdx) {
+            var lines = getActiveLines();
+            var leftStart = lineStarts[spreadIdx] || 0;
+            var rightStart = fillPageDiv(textL, lines, leftStart);
+            var afterRight  = fillPageDiv(textR, lines, rightStart);
+            lineStarts[spreadIdx + 1] = afterRight;
+            if (afterRight >= lines.length) lastContentSpread = spreadIdx;
+            return afterRight >= lines.length;
+        }
+
+        function resetPagination() {
+            lineStarts = [0];
+            contentSpread = 0;
+            lastContentSpread = 0;
+            resetMobilePagination();
         }
 
         // ── Sizing ──────────────────────────────────────────────
@@ -615,12 +746,13 @@
 
             var eventName = line.substring(0, colonIdx);
             var dialogue = line.substring(colonIdx);
-            var prefix3 = eventName.substring(0, 3).toLowerCase();
-            var charInfo = CHAR_MAP[prefix3];
+            var underIdx = eventName.indexOf('_');
+            var fullPrefix = (underIdx !== -1 ? eventName.substring(0, underIdx) : eventName).toLowerCase();
+            var charInfo = CHAR_MAP[fullPrefix] || CHAR_MAP[fullPrefix.substring(0, 3)] || { name: 'Unknown', initials: fullPrefix };
 
-            if (prefixMode === 'name' && charInfo) {
+            if (prefixMode === 'name') {
                 return charInfo.name + dialogue;
-            } else if (prefixMode === 'initials' && charInfo) {
+            } else if (prefixMode === 'initials') {
                 return charInfo.initials + dialogue;
             }
             return line;
@@ -633,8 +765,9 @@
 
             var eventName = line.substring(0, colonIdx);
             var dialogue = line.substring(colonIdx); // includes ": "
-            var prefix3 = eventName.substring(0, 3).toLowerCase();
-            var charInfo = CHAR_MAP[prefix3];
+            var underIdx = eventName.indexOf('_');
+            var prefix3 = (underIdx !== -1 ? eventName.substring(0, underIdx) : eventName).toLowerCase();
+            var charInfo = CHAR_MAP[prefix3] || CHAR_MAP[prefix3.substring(0, 3)] || { name: 'Unknown', initials: prefix3 };
 
             // Detect conversation events and extract the conversation key.
             // Event format: pXX_<conversationKey>_X_NN  e.g. pwh_wizard_tower_conversation_eight_d_01
@@ -648,9 +781,9 @@
             var prefixText;
             if (prefixMode === 'event') {
                 prefixText = escapeHtml(eventName);
-            } else if (prefixMode === 'name' && charInfo) {
+            } else if (prefixMode === 'name') {
                 prefixText = escapeHtml(charInfo.name);
-            } else if (prefixMode === 'initials' && charInfo) {
+            } else if (prefixMode === 'initials') {
                 prefixText = escapeHtml(charInfo.initials);
             } else {
                 prefixText = escapeHtml(eventName);
@@ -662,7 +795,7 @@
                 convBadge = '<span class="conv-badge" data-conv-key="' + escapeHtml(convKey) + '">' + badgeLabel + '</span>';
             }
 
-            if (charInfo) {
+            if (charInfo.color) {
                 var textCol = charInfo.textColor || '#ffffff';
                 return '<span class="line-prefix" data-char="' + prefix3 + '" '
                     + 'style="--prefix-bg:' + charInfo.color + '; --prefix-color:' + textCol + ';"'
@@ -681,15 +814,223 @@
         }
 
         // ── Display helpers ─────────────────────────────────────
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+
+        function useReader() {
+            return viewMode === 'reader';
+        }
+
+        function updateModeButtons() {
+            var tomeBtn = document.getElementById('modeTomeBtn');
+            var readerBtn = document.getElementById('modeReaderBtn');
+            if (!tomeBtn || !readerBtn) return;
+            tomeBtn.style.opacity = viewMode === 'tome' ? '1' : '0.45';
+            readerBtn.style.opacity = viewMode === 'reader' ? '1' : '0.45';
+            tomeBtn.style.borderColor = viewMode === 'tome' ? '#c4a265' : '#5a3a1a';
+            readerBtn.style.borderColor = viewMode === 'reader' ? '#c4a265' : '#5a3a1a';
+            var alignSection = document.getElementById('readerAlignSection');
+            if (alignSection) alignSection.style.display = viewMode === 'reader' ? 'flex' : 'none';
+            var darkSection = document.getElementById('readerDarkSection');
+            var darkDivider = document.getElementById('readerDarkDivider');
+            if (darkSection) darkSection.style.display = viewMode === 'reader' ? 'flex' : 'none';
+            if (darkDivider) darkDivider.style.display = viewMode === 'reader' ? '' : 'none';
+        }
+
+        function applyReaderTheme() {
+            var reader = document.getElementById('mobileReader');
+            var text = document.getElementById('mobileReaderText');
+            var prev = document.getElementById('mobilePrev');
+            var next = document.getElementById('mobileNext');
+            if (!reader) return;
+            if (readerDark) {
+                reader.style.background = '#13100a';
+                if (text) text.style.color = '#c8b070';
+                if (prev) { prev.style.background = '#1e1608'; prev.style.borderColor = '#6a4a20'; }
+                if (next) { next.style.background = '#1e1608'; next.style.borderColor = '#6a4a20'; }
+            } else {
+                reader.style.background = '#f0e0c0';
+                if (text) text.style.color = '#2a1a0a';
+                if (prev) { prev.style.background = '#3a2a1a'; prev.style.borderColor = '#5a3a1a'; }
+                if (next) { next.style.background = '#3a2a1a'; next.style.borderColor = '#5a3a1a'; }
+            }
+        }
+
+        function updateReaderPosition() {
+            var reader = document.getElementById('mobileReader');
+            if (!reader) return;
+            var m = document.getElementById('sideMenu');
+            var menuOpen = m && !m.classList.contains('collapsed');
+            if (menuOpen && reader.style.display !== 'none') {
+                reader.classList.add('reader-shifted');
+            } else {
+                reader.classList.remove('reader-shifted');
+            }
+        }
+
+        // Seek reader to the page containing targetLineIdx without resetting pagination from scratch.
+        function seekReaderToLine(targetLineIdx) {
+            resetMobilePagination();
+            document.getElementById('mobileReader').style.display = 'flex';
+            applyReaderTheme();
+            updateReaderPosition();
+            state = 'content';
+            if (targetLineIdx < 0) {
+                fillMobilePage(0);
+                return;
+            }
+            var el = document.getElementById('mobileReaderText');
+            el.style.fontSize = FONT_SIZE + 'px';
+            el.style.whiteSpace = 'pre-wrap';
+            var lines = getActiveLines();
+            var startPage = shouldShowIntro() ? 1 : 0;
+            mobilePageStarts[startPage] = 0;
+            var p = startPage;
+            while (true) {
+                var end = fillPageDiv(el, lines, mobilePageStarts[p]);
+                mobilePageStarts[p + 1] = end;
+                if (end > targetLineIdx || end >= lines.length) {
+                    mobilePage = p;
+                    break;
+                }
+                p++;
+                mobilePageStarts[p] = end;
+            }
+            fillMobilePage(mobilePage);
+        }
+
+        // Seek tome to the spread containing targetLineIdx.
+        function seekTomeToLine(targetLineIdx) {
+            clearText();
+            if (targetLineIdx < 0) {
+                setBaseImage('closed');
+                state = 'closed';
+                return;
+            }
+            setBaseImage('open');
+            state = 'content';
+            lineStarts = [0];
+            contentSpread = 0;
+            lastContentSpread = 0;
+            var lines = getActiveLines();
+            var spread = 0;
+            while (true) {
+                var leftStart = lineStarts[spread] || 0;
+                var rightStart = fillPageDiv(textL, lines, leftStart);
+                var afterRight = fillPageDiv(textR, lines, rightStart);
+                lineStarts[spread + 1] = afterRight;
+                if (afterRight > targetLineIdx || afterRight >= lines.length) {
+                    contentSpread = spread;
+                    if (afterRight >= lines.length) lastContentSpread = spread;
+                    break;
+                }
+                spread++;
+                lineStarts[spread] = afterRight;
+            }
+            fillSpread(contentSpread);
+        }
+
+        function setViewMode(mode) {
+            if (viewMode === mode) return;
+            // Save current position as a line index before switching
+            if (viewMode === 'reader') {
+                savedLineIdx = (mobilePage === 0 && shouldShowIntro())
+                    ? -1
+                    : (mobilePageStarts[mobilePage] !== undefined ? mobilePageStarts[mobilePage] : 0);
+            } else {
+                if (state === 'content') {
+                    var spreadStart = lineStarts[contentSpread] !== undefined ? lineStarts[contentSpread] : 0;
+                    var spreadEnd = lineStarts[contentSpread + 1];
+                    // Preserve savedLineIdx if it still falls within the current spread,
+                    // meaning the user hasn't navigated since the last view switch.
+                    var inSpread = spreadEnd !== undefined && savedLineIdx >= spreadStart && savedLineIdx < spreadEnd;
+                    if (!inSpread) {
+                        savedLineIdx = spreadStart;
+                    }
+                } else {
+                    savedLineIdx = -1;
+                }
+            }
+            viewMode = mode;
+            updateModeButtons();
+            if (mode === 'reader') {
+                var scene = document.querySelector('.scene');
+                if (scene) scene.style.display = 'none';
+                seekReaderToLine(savedLineIdx);
+            } else {
+                document.getElementById('mobileReader').style.display = 'none';
+                updateReaderPosition();
+                var scene2 = document.querySelector('.scene');
+                if (scene2) scene2.style.display = '';
+                seekTomeToLine(savedLineIdx);
+            }
+        }
+
+        function resetMobilePagination() {
+            mobilePageStarts = [0];
+            mobilePage = 0;
+        }
+
+        function shouldShowIntro() {
+            return !searchMode && charFilterPrefix === 'all';
+        }
+
+        function fillMobilePage(pageIdx) {
+            var el = document.getElementById('mobileReaderText');
+            el.style.fontSize = FONT_SIZE + 'px';
+            el.style.textAlign = readerCentered ? 'center' : 'left';
+            if (pageIdx === 0 && shouldShowIntro()) {
+                el.style.whiteSpace = 'normal';
+                el.innerHTML = firstPageHtmlReader;
+                mobilePageStarts[1] = 0;
+                document.getElementById('mobilePrev').disabled = true;
+                document.getElementById('mobileNext').disabled = false;
+                document.getElementById('mobilePageLabel').textContent = 'Page 1';
+                return;
+            }
+            el.style.whiteSpace = 'pre-wrap';
+            var lines = getActiveLines();
+            var start = mobilePageStarts[pageIdx] !== undefined ? mobilePageStarts[pageIdx] : 0;
+            var end = fillPageDiv(el, lines, start);
+            mobilePageStarts[pageIdx + 1] = end;
+            var isLast = end >= lines.length;
+            document.getElementById('mobilePrev').disabled = (pageIdx === 0);
+            document.getElementById('mobileNext').disabled = isLast;
+            document.getElementById('mobilePageLabel').textContent = 'Page ' + (pageIdx + 1);
+        }
+
+        function openMobileReader() {
+            var scene = document.querySelector('.scene');
+            if (scene) scene.style.display = 'none';
+            resetMobilePagination();
+            document.getElementById('mobileReader').style.display = 'flex';
+            applyReaderTheme();
+            updateReaderPosition();
+            fillMobilePage(0);
+            state = 'content';
+        }
+
+        function closeMobileReader() {
+            document.getElementById('mobileReader').style.display = 'none';
+            updateReaderPosition();
+            var scene = document.querySelector('.scene');
+            if (scene) scene.style.display = '';
+            clearText();
+            setBaseImage('closed');
+            state = 'closed';
+        }
+
         function showText(spreadIdx) {
-            var sp = spreads[spreadIdx];
-            if (!sp) { clearText(); return; }
-            textL.innerHTML = formatLines(sp.left);
-            textR.innerHTML = formatLines(sp.right);
-            textL.style.fontFamily = bookFontFamily;
-            textR.style.fontFamily = bookFontFamily;
-            textL.style.fontSize = bookFontSize + 'px';
-            textR.style.fontSize = bookFontSize + 'px';
+            contentSpread = spreadIdx;
+            if (useReader()) {
+                if (document.getElementById('mobileReader').style.display !== 'none') {
+                    resetMobilePagination();
+                    fillMobilePage(0);
+                }
+            } else {
+                fillSpread(spreadIdx);
+            }
         }
 
         function clearText() {
@@ -697,29 +1038,44 @@
             textR.innerHTML = '';
         }
 
-        var firstPageHtml =
+        var firstPageHtmlTome =
             '<div style="text-align:center; margin-bottom:8px;"><b style="font-size:1.4em;">Tome of Quotes</b></div>'
-            + '<div style="margin-bottom:6px;">All rights to the text, characters, and universe of Warhammer: Vermintide belong to <b>Fatshark AB</b>. '
+            + '<div style="text-align:center; margin-bottom:6px;">All rights to the text, characters, and universe of Warhammer: Vermintide belong to <b>Fatshark AB</b>. '
             + 'This project is a <b>non-commercial fan project</b> and is not affiliated with or endorsed by Fatshark.</div>'
-            + '<div style="margin-bottom:6px;">The text contained within is the complete collection of hero voice line subtitles, '
+            + '<div style="text-align:center; margin-bottom:6px;">The text contained within is the complete collection of hero voice line subtitles, '
             + 'ripped directly from the Wwise sound engine. Each line is prefixed with its original sound event name.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
-            + '<div style="margin-bottom:4px;"><b>Menu Options:</b></div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Font</b> &ndash; Choose your preferred reading font.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Text Size</b> &ndash; Adjust text size with the slider.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
-            + '<div style="margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
+            + '<div style="text-align:center; margin-bottom:4px;"><b>Menu Options:</b></div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
             + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
             + '<div style="text-align:center; margin-top:8px; font-style:italic;"><b>Enjoy the Tome!</b><br>&iexcl;OISEAUQUE!</div>';
+
+        var firstPageHtmlReader =
+            '<div style="text-align:center; margin-bottom:6px;">All rights to the text, characters, and universe of Warhammer: Vermintide belong to <b>Fatshark AB</b>. '
+            + 'This project is a <b>non-commercial fan project</b> and is not affiliated with or endorsed by Fatshark.</div>'
+            + '<div style="text-align:center; margin-bottom:6px;">The text contained within is the complete collection of hero voice line subtitles, '
+            + 'ripped directly from the Wwise sound engine. Each line is prefixed with its original sound event name.</div>'
+            + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
+            + '<div style="text-align:center; margin-bottom:4px;"><b>Menu Options:</b></div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Search</b> &ndash; Find lines containing a keyword.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Character</b> &ndash; Filter by hero: Kruber, Saltzpyre, Sienna, Kerillian, or Bardin.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Prefix</b> &ndash; Show the original event name, character name, or initials before each line.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Tome of Quotes</b> &ndash; Download the full original text file.</div>'
+            + '<div style="text-align:center; margin-bottom:3px;">&bull; <b>Download Current Text</b> &ndash; Download only the currently filtered &amp; formatted text.</div>'
+            + '<hr style="border:none; border-top:1px solid #5a4030; margin:6px 0;">'
+            + '<div style="text-align:center; margin-top:8px; font-style:italic;"><b>Enjoy the Tome!</b><br>&iexcl;OISEAUQUE!</div>';
+
+        var firstPageHtml = firstPageHtmlTome;
 
         function showFirstPage() {
             clearText();
             textR.style.fontFamily = "'Times New Roman', serif";
-            textR.style.fontSize = '11px';
-            textR.innerHTML = firstPageHtml;
+            textR.style.fontSize = FONT_SIZE + 'px';
+            textR.innerHTML = firstPageHtmlTome;
         }
 
         function setBaseImage(key) {
@@ -753,8 +1109,8 @@
                 var flipRightText = document.createElement('div');
                 flipRightText.className = 'page-text right';
                 flipRightText.style.pointerEvents = 'none';
-                flipRightText.style.fontFamily = bookFontFamily;
-                flipRightText.style.fontSize = bookFontSize + 'px';
+                flipRightText.style.fontFamily = FONT_FAMILY;
+                flipRightText.style.fontSize = FONT_SIZE + "px";
                 flipRightText.innerHTML = formatLines(opts.oldRightText);
                 layer.appendChild(flipRightText);
             }
@@ -764,8 +1120,8 @@
                 var flipLeftText = document.createElement('div');
                 flipLeftText.className = 'page-text left';
                 flipLeftText.style.pointerEvents = 'none';
-                flipLeftText.style.fontFamily = bookFontFamily;
-                flipLeftText.style.fontSize = bookFontSize + 'px';
+                flipLeftText.style.fontFamily = FONT_FAMILY;
+                flipLeftText.style.fontSize = FONT_SIZE + "px";
                 flipLeftText.innerHTML = formatLines(opts.oldLeftText);
                 layer.appendChild(flipLeftText);
             }
@@ -794,8 +1150,8 @@
                 var oldLeftText = document.createElement('div');
                 oldLeftText.className = 'page-text left';
                 oldLeftText.style.pointerEvents = 'none';
-                oldLeftText.style.fontFamily = bookFontFamily;
-                oldLeftText.style.fontSize = bookFontSize + 'px';
+                oldLeftText.style.fontFamily = FONT_FAMILY;
+                oldLeftText.style.fontSize = FONT_SIZE + "px";
                 oldLeftText.innerHTML = formatLines(opts.oldLeftText);
                 oldLeftLayer.appendChild(oldLeftText);
             }
@@ -803,30 +1159,19 @@
             // — Back-of-page layer: shows new left text arriving with the flip —
             var backLayer = null;
             if (!closing && opts.newText) {
-                var sp = spreads[opts.newText.spreadIdx];
-                if (sp) {
-                    backLayer = document.createElement('div');
-                    backLayer.className = 'flip-layer';
-                    // Clip to left half, exclude bottom 28% to keep bookmark stationary
-                    backLayer.style.clipPath = 'inset(0 50% 28% 0)';
-                    backLayer.style.webkitClipPath = 'inset(0 50% 28% 0)';
+                backLayer = document.createElement('div');
+                backLayer.className = 'flip-layer';
+                // Clip to left half, exclude bottom 28% to keep bookmark stationary
+                backLayer.style.clipPath = 'inset(0 50% 28% 0)';
+                backLayer.style.webkitClipPath = 'inset(0 50% 28% 0)';
 
-                    var backImg = document.createElement('img');
-                    backImg.src = IMAGES.open;
-                    backLayer.appendChild(backImg);
+                var backImg = document.createElement('img');
+                backImg.src = IMAGES.open;
+                backLayer.appendChild(backImg);
 
-                    var backText = document.createElement('div');
-                    backText.className = 'page-text left';
-                    backText.style.pointerEvents = 'none';
-                    backText.style.fontFamily = bookFontFamily;
-                    backText.style.fontSize = bookFontSize + 'px';
-                    backText.innerHTML = formatLines(sp.left);
-                    backLayer.appendChild(backText);
-
-                    // Start flipped (hidden via backface), rotate into view
-                    backLayer.style.transform = 'rotateY(180deg)';
-                    backLayer.style.backfaceVisibility = 'hidden';
-                }
+                // Start flipped (hidden via backface), rotate into view
+                backLayer.style.transform = 'rotateY(180deg)';
+                backLayer.style.backfaceVisibility = 'hidden';
             } else if (!closing && opts.backImage) {
                 // Back of a non-content page (e.g. inside of book cover)
                 backLayer = document.createElement('div');
@@ -867,21 +1212,11 @@
 
             setTimeout(function () {
                 if (opts.newText) {
-                    var sp2 = spreads[opts.newText.spreadIdx];
-                    if (sp2) {
-                        textR.innerHTML = formatLines(sp2.right);
-                        textR.style.fontFamily = bookFontFamily;
-                        textR.style.fontSize = bookFontSize + 'px';
-                        if (closing) {
-                            textL.innerHTML = formatLines(sp2.left);
-                            textL.style.fontFamily = bookFontFamily;
-                            textL.style.fontSize = bookFontSize + 'px';
-                        }
-                    }
+                    showText(opts.newText.spreadIdx);
                 }
                 if (opts.showFirstPageText) {
                     textR.style.fontFamily = "'Times New Roman', serif";
-                    textR.style.fontSize = '11px';
+                    textR.style.fontSize = FONT_SIZE + 'px';
                     textR.innerHTML = firstPageHtml;
                 }
             }, 60);
@@ -966,52 +1301,59 @@
 
             switch (state) {
                 case 'closed':
-                    // Open cover → first page
-                    doFlip({
-                        fromImg: IMAGES.closed,
-                        toKey: 'firstPage',
-                        direction: 'forward',
-                        showFirstPageText: true,
-                        onDone: function () { state = 'first_page'; showFirstPage(); }
-                    });
+                    if (useReader()) {
+                        openMobileReader();
+                    } else {
+                        // Open cover → first page
+                        doFlip({
+                            fromImg: IMAGES.closed,
+                            toKey: 'firstPage',
+                            direction: 'forward',
+                            showFirstPageText: true,
+                            onDone: function () { state = 'first_page'; showFirstPage(); }
+                        });
+                    }
                     break;
 
                 case 'first_page':
-                    // First page → first content spread
-                    contentSpread = 0;
-                    doFlip({
-                        fromImg: IMAGES.firstPage,
-                        toKey: 'open',
-                        direction: 'forward',
-                        newText: { spreadIdx: 0 },
-                        onDone: function () { state = 'content'; }
-                    });
+                    if (useReader()) {
+                        openMobileReader();
+                    } else {
+                        // First page → first content spread
+                        contentSpread = 0;
+                        doFlip({
+                            fromImg: IMAGES.firstPage,
+                            toKey: 'open',
+                            direction: 'forward',
+                            newText: { spreadIdx: 0 },
+                            onDone: function () { state = 'content'; }
+                        });
+                    }
                     break;
 
-                case 'content':
-                    if (contentSpread < spreads.length - 1) {
+                case 'content': {
+                    if (useReader()) break;
+                    var isLast = lineStarts[contentSpread + 1] !== undefined &&
+                                 lineStarts[contentSpread + 1] >= getActiveLines().length;
+                    if (!isLast) {
                         var nextSpread = contentSpread + 1;
-                        var oldSp = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'open',
                             direction: 'forward',
-                            oldLeftText: oldSp ? oldSp.left : '',
                             newText: { spreadIdx: nextSpread },
                             onDone: function () { contentSpread = nextSpread; }
                         });
                     } else {
-                        var oldSp2 = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'lastPage',
                             direction: 'forward',
-                            oldLeftText: oldSp2 ? oldSp2.left : '',
-                            oldRightText: oldSp2 ? oldSp2.right : '',
                             onDone: function () { state = 'last_page'; clearText(); }
                         });
                     }
                     break;
+                }
 
                 case 'last_page':
                     doFlip({
@@ -1046,25 +1388,25 @@
                     break;
 
                 case 'content':
+                    if (useReader()) {
+                        closeMobileReader();
+                        break;
+                    }
                     if (contentSpread > 0) {
                         var prevSpread = contentSpread - 1;
-                        var curSp = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'open',
                             direction: 'back',
                             newText: { spreadIdx: prevSpread },
-                            oldLeftText: curSp ? curSp.left : '',
                             onDone: function () { contentSpread = prevSpread; }
                         });
                     } else {
                         // Back to first page
-                        var curSp2 = spreads[contentSpread];
                         doFlip({
                             fromImg: IMAGES.open,
                             toKey: 'firstPage',
                             direction: 'back',
-                            oldLeftText: curSp2 ? curSp2.left : '',
                             showFirstPageText: true,
                             onDone: function () { state = 'first_page'; }
                         });
@@ -1072,34 +1414,45 @@
                     break;
 
                 case 'last_page':
-                    // Back to last content spread
-                    var lastSpreadIdx = Math.max(0, spreads.length - 1);
                     doFlip({
                         fromImg: IMAGES.lastPage,
                         toKey: 'open',
                         direction: 'back',
-                        newText: { spreadIdx: lastSpreadIdx },
-                        onDone: function () { state = 'content'; contentSpread = lastSpreadIdx; }
+                        newText: { spreadIdx: lastContentSpread },
+                        onDone: function () { state = 'content'; contentSpread = lastContentSpread; }
                     });
                     break;
             }
         }
 
         // ── Init ────────────────────────────────────────────────
-        // Track hide event refs state globally
+        // Track hide event refs / unknown chars state globally
         window.hideEventRefsChecked = true;
+        window.hideUnknownCharsChecked = true;
 
         Promise.all([preloadImages(), loadText()]).then(function () {
             setBaseImage('closed');
             clearText();
             fitBook();
-            // Re-paginate after first layout so measurements are accurate
-            paginateText(getActiveLines());
+            viewMode = isMobile() ? 'reader' : 'tome';
+            updateModeButtons();
+            if (useReader()) {
+                openMobileReader();
+            }
             window.addEventListener('resize', function () {
                 fitBook();
-                var oldSpreadIdx = contentSpread;
-                paginateText(getActiveLines());
-                if (state === 'content') showText(oldSpreadIdx);
+                var newMode = isMobile() ? 'reader' : 'tome';
+                if (viewMode !== newMode) {
+                    setViewMode(newMode);
+                } else if (useReader()) {
+                    var lineIdx = (mobilePage === 0 && shouldShowIntro())
+                        ? -1
+                        : (mobilePageStarts[mobilePage] !== undefined ? mobilePageStarts[mobilePage] : 0);
+                    seekReaderToLine(lineIdx);
+                } else if (state === 'content') {
+                    resetPagination();
+                    showText(0);
+                }
             });
             // ── Pointer / touch interaction ─────────────────────
             var pointerDown = null; // { x, y, target }
@@ -1129,18 +1482,24 @@
 
                 // Swipe detection (horizontal > 40px and more horizontal than vertical)
                 if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-                    if (dx < 0) {
-                        // Swipe left → forward
-                        handleClick();
-                    } else {
-                        // Swipe right → back (go to previous page)
-                        handleClickBack();
+                    if (!useReader() || state !== 'content') {
+                        if (dx < 0) {
+                            // Swipe left → forward
+                            handleClick();
+                        } else {
+                            // Swipe right → back (go to previous page)
+                            handleClickBack();
+                        }
                     }
                     return;
                 }
 
                 // Tap (short distance) — left side goes back, right side goes forward
                 if (dist <= 5) {
+                    if (useReader() && (state === 'closed' || state === 'first_page')) {
+                        openMobileReader();
+                        return;
+                    }
                     var bookRect = book.getBoundingClientRect();
                     var midX = bookRect.left + bookRect.width / 2;
                     if (x < midX) {
@@ -1167,6 +1526,61 @@
             book.addEventListener('touchend', function (e) {
                 var t = e.changedTouches[0];
                 onPointerUp(t.clientX, t.clientY, t.target);
+            });
+
+            // ── Mobile reader controls ───────────────────────────
+            document.getElementById('readerAlignBtn').addEventListener('click', function () {
+                readerCentered = !readerCentered;
+                var btn = document.getElementById('readerAlignBtn');
+                btn.textContent = readerCentered ? 'Center' : 'Left';
+                btn.style.color = readerCentered ? '#c4a265' : '#a08050';
+                btn.style.borderColor = readerCentered ? '#c4a265' : '#5a3a1a';
+                var el = document.getElementById('mobileReaderText');
+                el.style.textAlign = readerCentered ? 'center' : 'left';
+            });
+            document.getElementById('readerDarkBtn').addEventListener('click', function () {
+                readerDark = !readerDark;
+                var btn = document.getElementById('readerDarkBtn');
+                btn.textContent = readerDark ? 'Dark' : 'Light';
+                btn.style.color = readerDark ? '#c4a265' : '#a08050';
+                btn.style.borderColor = readerDark ? '#c4a265' : '#5a3a1a';
+                applyReaderTheme();
+            });
+            document.getElementById('mobilePrev').addEventListener('click', function () {
+                if (mobilePage <= 0) return;
+                mobilePage--;
+                fillMobilePage(mobilePage);
+            });
+            document.getElementById('mobileNext').addEventListener('click', function () {
+                if (document.getElementById('mobileNext').disabled) return;
+                mobilePage++;
+                fillMobilePage(mobilePage);
+            });
+            // Swipe within reader to turn pages
+            var mrSwipeStart = null;
+            document.getElementById('mobileReaderText').addEventListener('touchstart', function (e) {
+                var t = e.touches[0];
+                mrSwipeStart = { x: t.clientX, y: t.clientY };
+            }, { passive: true });
+            document.getElementById('mobileReaderText').addEventListener('touchend', function (e) {
+                if (!mrSwipeStart) return;
+                var t = e.changedTouches[0];
+                var dx = t.clientX - mrSwipeStart.x;
+                var dy = t.clientY - mrSwipeStart.y;
+                mrSwipeStart = null;
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                    if (dx < 0) {
+                        if (!document.getElementById('mobileNext').disabled) {
+                            mobilePage++;
+                            fillMobilePage(mobilePage);
+                        }
+                    } else {
+                        if (mobilePage > 0) {
+                            mobilePage--;
+                            fillMobilePage(mobilePage);
+                        }
+                    }
+                }
             });
 
             // ── Conversation badge click ─────────────────────────
@@ -1204,22 +1618,27 @@
                 var active = getActiveLines();
                 if (active.length === 0) {
                     searchInfo.textContent = 'No results found.';
-                    paginateText(['', '', 'No results found for:', '"' + key + '"']);
+                    resetPagination();
                 } else {
                     searchInfo.textContent = active.length + ' result(s) found.';
-                    paginateText(active);
+                    resetPagination();
                 }
                 contentSpread = 0;
                 if (state === 'content') {
                     showText(0);
                 } else {
-                    state = 'content';
-                    setBaseImage('open');
-                    showText(0);
+                    if (useReader()) {
+                        openMobileReader();
+                    } else {
+                        state = 'content';
+                        setBaseImage('open');
+                        showText(0);
+                    }
                 }
             }
             textL.addEventListener('click', onTextClick);
             textR.addEventListener('click', onTextClick);
+            document.getElementById('mobileReaderText').addEventListener('click', onTextClick);
 
             // ── Menu logic ──────────────────────────────────────
             var menu = document.getElementById('sideMenu');
@@ -1228,19 +1647,21 @@
             var searchBtn = document.getElementById('searchBtn');
             var searchClear = document.getElementById('searchClear');
             var searchInfo = document.getElementById('searchInfo');
-            var sizeSlider = document.getElementById('sizeSlider');
-            var sizeDisplay = document.getElementById('sizeDisplay');
-            var fontSelect = document.getElementById('fontSelect');
+
             var downloadBtn = document.getElementById('downloadBtn');
             var hideEventRefs = document.getElementById('hideEventRefs');
+            var hideUnknownChars = document.getElementById('hideUnknownChars');
+            // Hide unknown characters checkbox
+            hideUnknownChars.addEventListener('change', function() {
+                window.hideUnknownCharsChecked = hideUnknownChars.checked;
+                resetPagination();
+                if (state === 'content') showText(0);
+            });
             // Hide event references checkbox
             hideEventRefs.addEventListener('change', function() {
                 window.hideEventRefsChecked = hideEventRefs.checked;
-                paginateText(getActiveLines());
-                if (state === 'content') {
-                    contentSpread = 0;
-                    showText(0);
-                }
+                resetPagination();
+                if (state === 'content') showText(0);
             });
 
             // Toggle menu
@@ -1248,7 +1669,12 @@
                 e.stopPropagation();
                 menu.classList.toggle('collapsed');
                 toggle.textContent = menu.classList.contains('collapsed') ? '▶' : '◀';
+                updateReaderPosition();
             });
+
+            // Mode toggle buttons
+            document.getElementById('modeTomeBtn').addEventListener('click', function () { setViewMode('tome'); });
+            document.getElementById('modeReaderBtn').addEventListener('click', function () { setViewMode('reader'); });
 
             // Start collapsed on small screens
             if (window.innerWidth < 768) {
@@ -1276,10 +1702,10 @@
                 var active = getActiveLines();
                 if (active.length === 0 || (searchResults.length === 0)) {
                     searchInfo.textContent = 'No results found.';
-                    paginateText(['', '', 'No results found for:', '"' + query + '"']);
+                    resetPagination();
                 } else {
                     searchInfo.textContent = active.length + ' result(s) found.';
-                    paginateText(active);
+                    resetPagination();
                 }
 
                 // Navigate to content if not already there
@@ -1287,10 +1713,13 @@
                 if (state === 'content') {
                     showText(0);
                 } else {
-                    // Jump to open book with results
-                    state = 'content';
-                    setBaseImage('open');
-                    showText(0);
+                    if (useReader()) {
+                        openMobileReader();
+                    } else {
+                        state = 'content';
+                        setBaseImage('open');
+                        showText(0);
+                    }
                 }
             }
 
@@ -1303,11 +1732,8 @@
                 if (searchInput.value.trim() === '' && searchMode) {
                     searchMode = false;
                     searchInfo.textContent = '';
-                    paginateText(getActiveLines());
-                    if (state === 'content') {
-                        contentSpread = 0;
-                        showText(0);
-                    }
+                    resetPagination();
+                    if (state === 'content') showText(0);
                 }
             });
             searchClear.addEventListener('click', function () {
@@ -1316,38 +1742,10 @@
                 if (searchMode) {
                     searchMode = false;
                     searchInfo.textContent = '';
-                    paginateText(getActiveLines());
-                    if (state === 'content') {
-                        contentSpread = 0;
-                        showText(0);
-                    }
+                    resetPagination();
+                    if (state === 'content') showText(0);
                 }
                 searchInput.focus();
-            });
-
-            // ── Text Size ───────────────────────────────────────
-            sizeSlider.value = bookFontSize;
-            sizeDisplay.textContent = bookFontSize + 'px';
-
-            sizeSlider.addEventListener('input', function () {
-                bookFontSize = parseInt(sizeSlider.value);
-                sizeDisplay.textContent = bookFontSize + 'px';
-                paginateText(getActiveLines());
-                // Always reset to first page after resizing to avoid truncation bugs
-                contentSpread = 0;
-                if (state === 'content') {
-                    showText(0);
-                }
-            });
-
-            // ── Font ────────────────────────────────────────────
-            fontSelect.addEventListener('change', function () {
-                bookFontFamily = fontSelect.value;
-                paginateText(getActiveLines());
-                if (state === 'content') {
-                    if (contentSpread >= spreads.length) contentSpread = Math.max(0, spreads.length - 1);
-                    showText(contentSpread);
-                }
             });
 
             // ── Download ────────────────────────────────────────
@@ -1392,20 +1790,32 @@
             var charFilterEl = document.getElementById('charFilter');
             charFilterEl.addEventListener('change', function () {
                 charFilterPrefix = charFilterEl.value;
-                var active = getActiveLines();
-                if (active.length === 0) {
-                    active = ['', '', 'No lines for this character.'];
-                }
-                paginateText(active);
-                contentSpread = 0;
-                if (state === 'content') {
-                    showText(0);
+                resetPagination();
+                if (state === 'content') showText(0);
+            });
+
+            // ── Text Size ────────────────────────────────────────
+            var fontSizeSlider = document.getElementById('fontSizeSlider');
+            var fontSizeDisplay = document.getElementById('fontSizeDisplay');
+            fontSizeSlider.addEventListener('input', function () {
+                FONT_SIZE = parseInt(fontSizeSlider.value);
+                fontSizeDisplay.textContent = FONT_SIZE + 'px';
+                textL.style.fontSize = FONT_SIZE + 'px';
+                textR.style.fontSize = FONT_SIZE + 'px';
+                if (useReader()) {
+                    var lineIdx = (mobilePage === 0 && shouldShowIntro())
+                        ? -1
+                        : (mobilePageStarts[mobilePage] !== undefined ? mobilePageStarts[mobilePage] : 0);
+                    seekReaderToLine(lineIdx);
+                } else {
+                    resetPagination();
+                    if (state === 'content') showText(0);
+                    else if (state === 'first_page') showFirstPage();
                 }
             });
         });
     })();
     </script>
-</script>
     <script data-goatcounter="https://pirate-bytes.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>
